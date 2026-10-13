@@ -1,0 +1,39 @@
+========================================================================
+POLIAPP · UNEXPO VICERRECTORADO BARQUISIMETO
+(Estructurada con la misma arquitectura moderna de la app de JUMA)
+========================================================================
+
+¡Hola, Gabriel! Esta versión funciona 100% fluida, sin errores de instalación
+ni librerías rotas, exactamente con la misma técnica que usaste en JUMA:
+
+OPCIÓN 1: INSTALAR AL INSTANTE EN TU TELÉFONO
+1. Pasa esta carpeta o el archivo index.html a tu teléfono.
+2. Ábrelo con Google Chrome en el teléfono.
+3. Toca los 3 puntos (⋮) en la esquina superior y pulsa "Instalar aplicación"
+   o "Agregar a la pantalla principal".
+4. ¡Listo! Se instalará de inmediato en el menú de tu teléfono con su ícono
+   y funciona 100% OFFLINE (sin internet).
+
+OPCIÓN 2: SUBIR A GITHUB PAGES Y SACAR EL APK (TWA) CON PWABUILDER
+(Exactamente como creaste JUMA.apk)
+1. Sube estos archivos a un repositorio en tu cuenta de GitHub (ej. github.com/gabrielg739-prog/poliapp):
+   - index.html
+   - manifest.webmanifest
+   - sw.js
+   - la carpeta icons/
+2. En GitHub > Settings > Pages, activa GitHub Pages en la rama main.
+3. Entra en https://www.pwabuilder.com, ingresa tu enlace de GitHub Pages y descarga el APK oficial (TWA).
+
+========================================================================
+FUNCIONES LISTAS EN LA APP:
+========================================================================
+✔ Pensum completo de las 6 especialidades de la UNEXPO Barquisimeto.
+✔ Calificador en tiempo real sobre 100 puntos (aprueba con 50 ptos) y escala 1-9.
+✔ Calculador del mínimo de puntos requeridos para pasar.
+✔ Mensajes motivadores universitarios cada vez que abres una asignatura.
+✔ Subida de fotos múltiples de notas y comprobantes (guardado permanente).
+✔ Planilla de inscripción y expediente del alumno con foto y nombre.
+✔ Turnos URACE por SHA-256 y Horarios oficiales por sección 2026-2.
+✔ Reglamentos estudiantiles del Poli.
+✔ Perfil Maestro oculto de la vista de alumnos (clave: urace2026).
+========================================================================
