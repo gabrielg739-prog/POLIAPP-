@@ -1734,27 +1734,60 @@ details.hrs summary {
       </div>
     </div>
 
-    <!-- ZONA DE SUBIDA DE FOTOS Y DOCUMENTOS DE NOTAS -->
-    <div class="card" style="border-top:3.5px solid var(--cat-yellow);">
-      <div class="card-header">
+    
+    <!-- SECCIÓN: SUBIDA Y GESTIÓN DE NOTAS (REGLA 1: LIMPIA MÓVIL VS PC) -->
+    <div class="card" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);">
+      <div class="card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
         <div>
-          <h3 class="card-title">📷 Subir Récord o Fotos de Calificaciones</h3>
-          <small style="color:var(--text-muted);font-weight:700;">Sube las fotos de tu récord o notas: se cargan directamente a tus materias tal cual están.</small>
+          <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
+            <span>📷</span> Carga de Notas y Récord Académico
+          </h3>
+          <small style="color:var(--text-muted);font-weight:700;">
+            Sube fotos de pantalla de PC, capturas o PDFs: el motor extraerá automáticamente tus notas exactas.
+          </small>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="document.getElementById('inputFileNotas').click()">+ Subir Archivos</button>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <!-- Hidden Input accesible para ambos dispositivos -->
+          <input type="file" id="inputFileNotas" multiple accept="image/*,.pdf,application/pdf" style="display:none;" onchange="handleUploadedFiles(this.files)">
+          <button type="button" class="btn btn-primary" id="btnSubirNotas" onclick="triggerSubirNotas()" style="font-weight:900;padding:10px 22px;font-size:14px;box-shadow:0 3px 10px rgba(255,184,0,0.35);">
+            📥 Subir Mis Notas
+          </button>
+        </div>
       </div>
 
-      <div class="dropzone-box" onclick="document.getElementById('inputFileNotas').click()" ondragover="event.preventDefault(); this.style.borderColor='var(--cat-yellow)'; this.style.background='rgba(255,184,0,0.06)';" ondragleave="this.style.borderColor=''; this.style.background='';" ondrop="event.preventDefault(); this.style.borderColor=''; this.style.background=''; handleUploadedFiles(event.dataTransfer.files);">
-        <input type="file" id="inputFileNotas" multiple accept="image/*,.pdf" style="display:none;" onchange="handleUploadedFiles(this.files)">
-        <div style="font-size:36px;margin-bottom:6px;">📤</div>
-        <b style="font-size:15px;color:var(--unexpo-navy);display:block;">⚡ Toca aquí o arrastra las fotos de tus notas para cargarlas</b>
-        <span style="font-size:12.5px;color:var(--text-muted);">Las asignaturas y calificaciones se cargan tal cual a tus materias sin alteraciones</span>
+      <!-- MODAL / ÁREA DE ARRASTRE EXCLUSIVA PARA COMPUTADORA (REGLA 1: Solo en PC al pulsar el botón) -->
+      <div id="modalUploadPC" class="modal-overlay" style="display:none;z-index:9999;">
+        <div class="modal-box" style="max-width:540px;border-top:4px solid var(--cat-yellow);padding:20px;">
+          <div class="modal-header" style="margin-bottom:14px;">
+            <h3 class="modal-title" style="display:flex;align-items:center;gap:8px;font-size:16px;">
+              <span>💻</span> Subir Notas desde tu Computadora
+            </h3>
+            <button type="button" class="modal-close" onclick="closeModalUploadPC()">&times;</button>
+          </div>
+          <div class="modal-body" style="padding:0;margin-bottom:14px;">
+            <div id="pcDropzoneArea" class="dropzone-box" onclick="document.getElementById('inputFileNotas').click()"
+                 ondragover="event.preventDefault(); this.style.borderColor='var(--cat-yellow)'; this.style.background='rgba(255,184,0,0.08)';"
+                 ondragleave="this.style.borderColor=''; this.style.background='';"
+                 ondrop="event.preventDefault(); this.style.borderColor=''; this.style.background=''; closeModalUploadPC(); handleUploadedFiles(event.dataTransfer.files);"
+                 style="cursor:pointer;padding:36px 20px;text-align:center;border:2px dashed var(--cat-yellow);border-radius:14px;background:var(--paper-bg);transition:all 0.2s ease;">
+              <div style="font-size:44px;margin-bottom:8px;">📥</div>
+              <b style="font-size:15px;color:var(--unexpo-navy);display:block;margin-bottom:4px;">Arrastra aquí tus capturas o fotos de notas</b>
+              <span style="font-size:13px;color:var(--text-muted);display:block;margin-bottom:14px;">o haz clic aquí para examinar archivos en tu equipo</span>
+              <button type="button" class="btn btn-secondary btn-sm" style="font-weight:800;border-color:var(--cat-yellow);color:var(--unexpo-navy);padding:6px 16px;">
+                Examinar Archivos
+              </button>
+            </div>
+            <div style="margin-top:12px;font-size:12px;color:var(--text-muted);line-height:1.5;">
+              💡 Admite múltiples imágenes JPG, PNG, WEBP, fotos directas al monitor de la computadora y documentos PDF.
+            </div>
+          </div>
+          <div class="modal-footer" style="padding:0;display:flex;justify-content:flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closeModalUploadPC()">Cancelar</button>
+          </div>
+        </div>
       </div>
 
-      <!-- Galería de Documentos Subidos -->
-      <div id="docGallery" class="doc-gallery-grid"></div>
-
-      <!-- ================= FASE 4: CONTENEDOR DE ESCANEO Y PROGRESO ================= -->
+      <!-- MONITOR DE PROGRESO DE ESCANEO -->
       <div id="scanStatusArea" style="display:none;margin-top:14px;background:#071530;border:1.5px solid var(--cat-yellow);border-radius:12px;padding:16px;color:#FFF;box-shadow:var(--shadow-md);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
           <b style="font-size:14px;color:var(--cat-yellow);display:flex;align-items:center;gap:8px;">
@@ -1768,9 +1801,120 @@ details.hrs summary {
         <div id="scanStatusDetail" style="font-size:12px;color:#CBD5E1;font-family:'Space Grotesk',monospace;">Iniciando preprocesamiento canvas...</div>
       </div>
 
-      <!-- TABLA DE REVISIÓN RÁPIDA DE MATERIAS DETECTADAS (FASE 4) -->
+      <!-- CUADRO DE REVISIÓN Y CONFIRMACIÓN TEMPORAL (REGLA 5: Se oculta y limpia al guardar) -->
       <div id="scanReviewContainer" style="display:none;margin-top:16px;"></div>
 
+    </div>
+
+    <!-- BASE DE DATOS EN COLUMNAS: HISTORIAL ACUMULADO DE CALIFICACIONES (REGLA 5) -->
+    <div class="card" id="gradesDatabaseCard" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);margin-top:16px;">
+      <div class="card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
+        <div>
+          <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
+            <span>📊</span> Base de Datos de Calificaciones (Récord Acumulado)
+          </h3>
+          <small id="gradesDbSubtitle" style="color:var(--text-muted);font-weight:700;">
+            Historial oficial en columnas. Puedes editar cualquier nota o sección directamente.
+          </small>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <input type="text" id="gradesDbSearchInput" class="form-control" placeholder="🔍 Filtrar materia o código..." style="width:200px;font-size:12.5px;padding:6px 10px;" oninput="renderGradesDatabaseTable()">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openAddGradeModal()" style="font-weight:800;border-color:var(--cat-yellow);color:var(--unexpo-navy);">
+            + Agregar Materia
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="triggerSubirNotas()" style="font-weight:800;">
+            📥 Subir Más Notas
+          </button>
+        </div>
+      </div>
+
+      <!-- Resumen estadístico de la Base de Datos -->
+      <div id="gradesDbStatsBanner" style="background:var(--paper-bg);padding:10px 14px;border-radius:8px;margin:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border:1px solid var(--card-border);font-size:13px;">
+        <!-- Inyectado dinámicamente -->
+      </div>
+
+      <!-- Contenedor de la Tabla en Columnas -->
+      <div style="overflow-x:auto;padding:0 16px 16px 16px;">
+        <table class="table-columns-db" style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">
+          <thead>
+            <tr style="background:#071530;color:#FFF;text-align:left;">
+              <th style="padding:10px 12px;width:95px;">Código</th>
+              <th style="padding:10px 12px;">Asignatura</th>
+              <th style="padding:10px 12px;text-align:center;width:75px;">Semestre</th>
+              <th style="padding:10px 12px;text-align:center;width:60px;">U.C.</th>
+              <th style="padding:10px 12px;text-align:center;width:80px;">CSS (Sec)</th>
+              <th style="padding:10px 12px;text-align:center;width:95px;">Nota Exacta</th>
+              <th style="padding:10px 12px;text-align:center;width:110px;">Estado</th>
+              <th style="padding:10px 12px;text-align:right;width:70px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="gradesDatabaseTbody">
+            <!-- Inyectado dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECCIÓN / CARPETA: MIS DOCUMENTOS RESPALDADOS EN INDEXEDDB (REGLA 6) -->
+    <div class="card" id="userDocumentsCard" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);margin-top:16px;">
+      <div class="card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
+        <div>
+          <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
+            <span>📂</span> Mis Documentos (Fotos y Capturas en Alta Definición)
+          </h3>
+          <small style="color:var(--text-muted);font-weight:700;">
+            Almacenamiento local seguro en IndexedDB para no saturar memoria. Pulsa cualquier documento para abrirlo en el visor interactivo.
+          </small>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerSubirNotas()" style="font-weight:800;border-color:var(--cat-yellow);">
+          + Subir Otro Documento
+        </button>
+      </div>
+
+      <!-- Galería de Documentos Subidos -->
+      <div id="docGallery" class="doc-gallery-grid" style="padding:16px;"></div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR MATERIA MANUAL A LA BASE DE DATOS -->
+    <div id="modalAddManualSubject" class="modal-overlay" style="display:none;z-index:9999;">
+      <div class="modal-box" style="max-width:480px;border-top:4px solid var(--cat-yellow);padding:20px;">
+        <div class="modal-header" style="margin-bottom:12px;">
+          <h3 class="modal-title" style="font-size:16px;font-weight:900;color:var(--unexpo-navy);">+ Agregar Materia a Base de Datos</h3>
+          <button type="button" class="modal-close" onclick="closeModal('modalAddManualSubject')">&times;</button>
+        </div>
+        <div class="modal-body" style="padding:0;display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Código UNEXPO:</label>
+            <input type="text" id="manualSubjCode" class="form-control" placeholder="Ej: EB1115" maxlength="8" oninput="this.value=this.value.toUpperCase(); autoFillManualSubject(this.value)">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Nombre de Asignatura:</label>
+            <input type="text" id="manualSubjName" class="form-control" placeholder="Ej: CÁLCULO I">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div>
+              <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Semestre:</label>
+              <input type="text" id="manualSubjSem" class="form-control" placeholder="I" style="text-align:center;">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">U.C.:</label>
+              <input type="number" id="manualSubjUc" class="form-control" placeholder="5" min="1" max="10" style="text-align:center;">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">CSS (Sec):</label>
+              <input type="text" id="manualSubjCss" class="form-control" placeholder="01" style="text-align:center;">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Nota Exacta (1-9 pts o N.P.):</label>
+            <input type="text" id="manualSubjScore" class="form-control" placeholder="Ej: 7,4" style="text-align:center;font-weight:900;font-size:15px;color:var(--unexpo-navy);">
+          </div>
+        </div>
+        <div class="modal-footer" style="padding:0;margin-top:14px;display:flex;justify-content:flex-end;gap:8px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddManualSubject')">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="saveManualSubject()" style="font-weight:900;">Guardar Materia</button>
+        </div>
+      </div>
     </div>
 
     <!-- Selector de Carrera & Dashboard de Rendimiento -->
@@ -2302,14 +2446,44 @@ details.hrs summary {
   </div>
 </div>
 
-<!-- MODAL: VISOR DE DOCUMENTO / FOTO DE NOTAS -->
-<div class="modal-overlay" id="modalDocViewer">
-  <div class="modal-box" style="max-width:850px;width:95vw;padding:18px;">
-    <div class="modal-header">
-      <h3 id="docViewerTitle">Visor de Documento</h3>
-      <button class="modal-close" onclick="closeModal('modalDocViewer')">&times;</button>
+<!-- MODAL: VISOR DE DOCUMENTO INTERACTIVO CON ZOOM, PANNING Y ROTACIÓN (REGLA 6) -->
+<div class="modal-overlay" id="modalDocViewer" style="z-index:99999;">
+  <div class="modal-box" style="max-width:980px;width:96vw;padding:16px;max-height:92vh;display:flex;flex-direction:column;">
+    <div class="modal-header" style="flex-wrap:wrap;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px solid var(--card-border);">
+      <div>
+        <h3 id="docViewerTitle" style="font-size:16px;font-weight:900;margin:0;color:var(--unexpo-navy);display:flex;align-items:center;gap:8px;">
+          <span>👁️</span> Visor de Documento
+        </h3>
+        <small id="docViewerMeta" style="color:var(--text-muted);font-weight:700;font-size:11.5px;">Alta Definición · Zoom y Panning interactivo</small>
+      </div>
+
+      <!-- Barra de Herramientas del Visor -->
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <div id="pdfPageNavArea" style="display:none;align-items:center;gap:4px;margin-right:6px;background:var(--paper-bg);padding:2px 8px;border-radius:6px;border:1px solid var(--card-border);">
+          <button type="button" class="btn btn-secondary btn-sm" style="padding:2px 6px;font-size:11px;" onclick="prevDocViewerPdfPage()">◀</button>
+          <span id="pdfPageIndicator" style="font-size:11.5px;font-weight:800;padding:0 4px;">1 / 1</span>
+          <button type="button" class="btn btn-secondary btn-sm" style="padding:2px 6px;font-size:11px;" onclick="nextDocViewerPdfPage()">▶</button>
+        </div>
+
+        <button type="button" class="btn btn-secondary btn-sm" onclick="zoomDocViewer(-0.25)" title="Reducir Zoom" style="font-weight:900;padding:4px 9px;">🔍−</button>
+        <span id="docViewerZoomBadge" style="font-size:11.5px;font-weight:900;background:var(--paper-bg);padding:3px 8px;border-radius:6px;border:1px solid var(--card-border);min-width:44px;text-align:center;">100%</span>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="zoomDocViewer(0.25)" title="Aumentar Zoom" style="font-weight:900;padding:4px 9px;">🔍+</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="rotateDocViewer(90)" title="Rotar 90°" style="font-weight:900;padding:4px 9px;">🔄 90°</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="resetDocViewer()" title="Restablecer Vista" style="font-weight:800;padding:4px 9px;">↺ Reset</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="downloadActiveDoc()" title="Descargar original" style="font-weight:900;padding:4px 10px;">⬇️</button>
+        <button class="modal-close" onclick="closeModal('modalDocViewer')">&times;</button>
+      </div>
     </div>
-    <div class="modal-body" id="docViewerBody" style="text-align:center;max-height:75vh;overflow:auto;"></div>
+
+    <!-- Viewport interactivo con soporte de Pan y Pinch -->
+    <div id="docViewerViewport" style="flex:1;min-height:360px;max-height:72vh;overflow:hidden;background:#0F172A;border-radius:10px;position:relative;cursor:grab;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;">
+      <div id="docViewerContent" style="transform-origin:center center;transition:transform 0.1s ease-out;display:inline-block;line-height:0;">
+        <!-- Inyectado dinámicamente -->
+      </div>
+      <div style="position:absolute;bottom:8px;right:10px;font-size:11px;color:rgba(255,255,255,0.6);pointer-events:none;background:rgba(0,0,0,0.4);padding:2px 8px;border-radius:4px;">
+        Arrastra para mover · Rueda / Pellizco para zoom
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3661,79 +3835,8 @@ function updateMotivationalQuote() {
   if (qEl) qEl.textContent = MOTIVE_QUOTES[Math.floor(Math.random() * MOTIVE_QUOTES.length)];
 }
 
-// ================= GESTIÓN DE NOTAS Y FOTOS SUBIDAS =================
-function handleUploadedFiles(files) {
-  if (!files || !files.length) return;
-  const fileList = Array.from(files);
-
-  fileList.forEach((file) => {
-    const reader = new FileReader();
-    reader.onload = function(evt) {
-      const doc = {
-        id: 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-        name: file.name,
-        type: file.type,
-        date: new Date().toLocaleDateString('es-VE'),
-        dataUrl: evt.target.result
-      };
-      userDocuments.push(doc);
-      saveActiveUserData();
-      renderDocumentGallery();
-      cargarMateriasDirectoTalCual(doc);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-function renderDocumentGallery() {
-  const gal = $('docGallery');
-  if (!gal) return;
-
-  if (!userDocuments.length) {
-    gal.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:12px;color:var(--text-muted);font-size:13px;">No has subido fotos de notas aún. Pulsa arriba para agregar fotos de tu récord o kardex.</div>';
-    return;
-  }
-
-  gal.innerHTML = userDocuments.map((doc, idx) => {
-    const isPdf = doc.type && doc.type.includes('pdf');
-    const thumb = isPdf
-      ? '<div style="height:76px;display:flex;align-items:center;justify-content:center;background:#FEF2F2;color:#EF4444;font-size:32px;">📄</div>'
-      : '<img class="doc-thumb" src="' + doc.dataUrl + '" alt="Nota">';
-
-    return `
-      <div class="doc-card" onclick="openDocViewer(${idx})">
-        <button type="button" class="doc-del" onclick="event.stopPropagation(); deleteDoc('${doc.id}')" title="Eliminar archivo">✕</button>
-        ${thumb}
-        <div style="font-size:11.5px;font-weight:700;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${doc.name}</div>
-        <small style="color:var(--text-muted);font-size:10px;">${doc.date}</small>
-        <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;font-size:11px;padding:3px 6px;width:100%;font-weight:800;color:var(--unexpo-navy);border-color:var(--cat-yellow);" onclick="event.stopPropagation(); openDocViewer(${idx})">
-          👁️ Ver Documento
-        </button>
-      </div>
-    `;
-  }).join('');
-}
-
-function extractDocumentRawText(doc) {
-  let text = (doc.name || '') + ' ' + (doc.type || '');
-  if (doc.dataUrl) {
-    try {
-      if (doc.type && doc.type.includes('pdf')) {
-        const raw = atob(doc.dataUrl.split(',')[1] || '');
-        const matches = raw.match(/\(([^()]{2,120})\)/g);
-        if (matches) {
-          text += ' ' + matches.map(m => m.slice(1, -1)).join(' ');
-        }
-      }
-    } catch (e) {}
-  }
-  return text.toUpperCase();
-}
-
-
-
 // ===========================================================================
-// FASE 4: MOTOR INTERNO DE VISIÓN ARTIFICIAL, LEVENSHTEIN Y PARSER UNEXPO
+// POLIAPP UNEXPO: MOTOR UNIVERSAL DE ESCANEO, INDEXEDDB Y BASE DE DATOS
 // ===========================================================================
 
 var detectedScanSubjects = [];
@@ -3745,102 +3848,260 @@ var detectedScanMetadata = {
   indice: ''
 };
 
-// 1. PIPELINE DE MEJORA VISUAL INDEPENDIENTE DE PÍXELES (HTML5 CANVAS)
-function preprocessImageForOCR(sourceImg) {
-  var canvas = document.createElement('canvas');
-  var ctx = canvas.getContext('2d', { willReadFrequently: true });
+// ===========================================================================
+// 1. REGLA 1: DETECCIÓN TELÉFONO VS COMPUTADORA & INTERFAZ LIMPIA
+// ===========================================================================
+function isMobileDevice() {
+  if (typeof window === 'undefined') return false;
+  return (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+         ('ontouchstart' in window) ||
+         (navigator.maxTouchPoints > 0) ||
+         /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+}
 
+function triggerSubirNotas() {
+  if (isMobileDevice()) {
+    // EN TELÉFONO / MÓVIL: Abre DIRECTO el selector nativo (cámara / galería / archivos)
+    var input = document.getElementById('inputFileNotas');
+    if (input) input.click();
+  } else {
+    // EN COMPUTADORA (PC): Abre ventana/modal limpia donde sí permite arrastrar
+    var modal = document.getElementById('modalUploadPC');
+    if (modal) {
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+    } else {
+      var input = document.getElementById('inputFileNotas');
+      if (input) input.click();
+    }
+  }
+}
+
+function closeModalUploadPC() {
+  var modal = document.getElementById('modalUploadPC');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+  }
+}
+
+// ===========================================================================
+// 2. REGLA 6: ALMACENAMIENTO DE DOCUMENTOS EN INDEXEDDB
+// ===========================================================================
+var DOCS_DB_NAME = 'PoliApp_Docs_v1';
+var DOCS_STORE_NAME = 'documents';
+var docsDbInstance = null;
+
+function getDocsDB() {
+  return new Promise(function(resolve) {
+    if (docsDbInstance) return resolve(docsDbInstance);
+    if (typeof indexedDB === 'undefined') return resolve(null);
+    try {
+      var req = indexedDB.open(DOCS_DB_NAME, 1);
+      req.onupgradeneeded = function(e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(DOCS_STORE_NAME)) {
+          db.createObjectStore(DOCS_STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = function(e) {
+        docsDbInstance = e.target.result;
+        resolve(docsDbInstance);
+      };
+      req.onerror = function() {
+        resolve(null);
+      };
+    } catch (err) {
+      resolve(null);
+    }
+  });
+}
+
+async function saveDocToStorage(doc) {
+  var db = await getDocsDB();
+  if (db) {
+    return new Promise(function(resolve) {
+      try {
+        var tx = db.transaction(DOCS_STORE_NAME, 'readwrite');
+        tx.objectStore(DOCS_STORE_NAME).put(doc);
+        tx.oncomplete = function() { resolve(true); };
+        tx.onerror = function() { resolve(false); };
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
+  return false;
+}
+
+async function getAllDocsFromStorage() {
+  var db = await getDocsDB();
+  if (db) {
+    return new Promise(function(resolve) {
+      try {
+        var tx = db.transaction(DOCS_STORE_NAME, 'readonly');
+        var req = tx.objectStore(DOCS_STORE_NAME).getAll();
+        req.onsuccess = function() { resolve(req.result || []); };
+        req.onerror = function() { resolve([]); };
+      } catch (e) {
+        resolve([]);
+      }
+    });
+  }
+  return [];
+}
+
+async function deleteDocFromStorage(id) {
+  var db = await getDocsDB();
+  if (db) {
+    return new Promise(function(resolve) {
+      try {
+        var tx = db.transaction(DOCS_STORE_NAME, 'readwrite');
+        tx.objectStore(DOCS_STORE_NAME).delete(id);
+        tx.oncomplete = function() { resolve(true); };
+        tx.onerror = function() { resolve(false); };
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
+  return false;
+}
+
+async function initUserDocuments() {
+  try {
+    var stored = await getAllDocsFromStorage();
+    if (stored && stored.length > 0) {
+      userDocuments = stored;
+    }
+  } catch (e) {
+    console.warn('Fallback documentos en memoria:', e);
+  }
+  renderDocumentGallery();
+}
+
+// ===========================================================================
+// 3. REGLA 2: PREPROCESAMIENTO CANVAS (ANTI-MOIRÉ, MULTI-COLOR Y DIVISIÓN DE FONDO)
+// ===========================================================================
+function preprocessImageForOCR(sourceImg) {
   var origW = sourceImg.naturalWidth || sourceImg.videoWidth || sourceImg.width;
   var origH = sourceImg.naturalHeight || sourceImg.videoHeight || sourceImg.height;
 
-  // a) Reescalado proporcional: Si ancho < 1600px, ampliar proporcionalmente (x2 o x3)
-  var scale = 1;
-  if (origW < 800) scale = 3;
-  else if (origW < 1600) scale = 2;
-  else if (origW > 3200) scale = 3200 / origW;
+  // 1. Escalado inteligente:
+  // Si es pequeña (< 1200px), escalar x2 para definición.
+  // Si es gigante de cámara (> 2400px), ajustar a 2200px óptimo manteniendo proporción.
+  var targetW = origW;
+  var targetH = origH;
+  if (origW < 1200) {
+    targetW = Math.round(origW * 2);
+    targetH = Math.round(origH * 2);
+  } else if (origW > 2400) {
+    var scaleDown = 2200 / origW;
+    targetW = 2200;
+    targetH = Math.round(origH * scaleDown);
+  }
 
-  var targetW = Math.round(origW * scale);
-  var targetH = Math.round(origH * scale);
-
+  var canvas = document.createElement('canvas');
   canvas.width = targetW;
   canvas.height = targetH;
-
+  var ctx = canvas.getContext('2d', { willReadFrequently: true });
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(sourceImg, 0, 0, targetW, targetH);
 
   var imgData = ctx.getImageData(0, 0, targetW, targetH);
   var data = imgData.data;
-  var len = data.length;
-
-  // b) Grayscale con luminancia ITU-R BT.601
   var totalPixels = targetW * targetH;
-  var gray = new Uint8Array(totalPixels);
-  var hist = new Int32Array(256);
 
-  for (var i = 0, g = 0; i < len; i += 4, g++) {
-    var val = (data[i] * 299 + data[i + 1] * 587 + data[i + 2] * 114) / 1000;
-    val = val | 0;
-    gray[g] = val;
-    hist[val]++;
+  // Grayscale ITU-R BT.601
+  var gray = new Float32Array(totalPixels);
+  for (var i = 0, g = 0; i < data.length; i += 4, g++) {
+    gray[g] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
   }
 
-  // Estiramiento de Contraste (Percentiles 2% y 98%)
-  var pLow = totalPixels * 0.02;
-  var pHigh = totalPixels * 0.98;
-  var count = 0;
-  var minG = 0, maxG = 255;
+  // 2. Filtro Anti-Moiré (Para fotos tomadas a pantallas/monitores de computadora):
+  // Micro-suavizado promedio 3x3 para eliminar la cuadrícula/rayas de píxeles del monitor
+  var smoothed = new Float32Array(totalPixels);
+  for (var y = 0; y < targetH; y++) {
+    var yPrev = y > 0 ? (y - 1) * targetW : y * targetW;
+    var yCur  = y * targetW;
+    var yNext = y < targetH - 1 ? (y + 1) * targetW : y * targetW;
+    for (var x = 0; x < targetW; x++) {
+      var xPrev = x > 0 ? x - 1 : x;
+      var xNext = x < targetW - 1 ? x + 1 : x;
 
-  for (var k = 0; k < 256; k++) {
-    count += hist[k];
-    if (minG === 0 && count >= pLow) minG = k;
-    if (count >= pHigh) { maxG = k; break; }
+      var val = (
+        gray[yPrev + xPrev] + 2 * gray[yPrev + x] + gray[yPrev + xNext] +
+        2 * gray[yCur + xPrev] + 4 * gray[yCur + x] + 2 * gray[yCur + xNext] +
+        gray[yNext + xPrev] + 2 * gray[yNext + x] + gray[yNext + xNext]
+      ) / 16;
+      smoothed[yCur + x] = val;
+    }
   }
-  if (maxG <= minG) { minG = 0; maxG = 255; }
 
-  var stretchFactor = 255 / (maxG - minG);
-  for (var g = 0; g < totalPixels; g++) {
-    var sVal = (gray[g] - minG) * stretchFactor;
-    gray[g] = sVal < 0 ? 0 : (sVal > 255 ? 255 : (sVal | 0));
+  // Comprobar polaridad (modo oscuro vs modo claro):
+  var sampleSum = 0;
+  var step = Math.max(1, (totalPixels / 2000) | 0);
+  var samples = 0;
+  for (var s = 0; s < totalPixels; s += step) {
+    sampleSum += smoothed[s];
+    samples++;
+  }
+  var avgLuma = samples > 0 ? sampleSum / samples : 128;
+  if (avgLuma < 115) {
+    // Si el fondo promedio es oscuro, invertir para trabajar en texto oscuro sobre fondo blanco
+    for (var g = 0; g < totalPixels; g++) {
+      smoothed[g] = 255 - smoothed[g];
+    }
   }
 
-  // Binarización Adaptativa Local mediante Imagen Integral
-  var winSize = Math.max(15, (targetW / 35) | 0);
-  if ((winSize % 2) === 0) winSize++;
-  var halfWin = (winSize / 2) | 0;
-
-  var intImg = new Float64Array((targetW + 1) * (targetH + 1));
+  // 3. Normalización Local de Fondo e Iluminación (División de Fondo / Multi-Color):
+  // Calculamos el fondo local usando imagen integral para ventana adaptativa (R ~ 20-30 px)
   var stride = targetW + 1;
-
+  var intImg = new Float64Array((targetW + 1) * (targetH + 1));
   for (var y = 0; y < targetH; y++) {
     var rowSum = 0;
+    var rowOff = y * targetW;
     for (var x = 0; x < targetW; x++) {
-      rowSum += gray[y * targetW + x];
+      rowSum += smoothed[rowOff + x];
       intImg[(y + 1) * stride + (x + 1)] = intImg[y * stride + (x + 1)] + rowSum;
     }
   }
 
-  var C = 7; // offset de contraste
+  var bgRadius = Math.max(16, Math.min(32, (targetW / 40) | 0));
   for (var y = 0; y < targetH; y++) {
-    var y1 = Math.max(0, y - halfWin);
-    var y2 = Math.min(targetH - 1, y + halfWin);
+    var y1 = Math.max(0, y - bgRadius);
+    var y2 = Math.min(targetH - 1, y + bgRadius);
+    var rowOff = y * targetW;
     for (var x = 0; x < targetW; x++) {
-      var x1 = Math.max(0, x - halfWin);
-      var x2 = Math.min(targetW - 1, x + halfWin);
+      var x1 = Math.max(0, x - bgRadius);
+      var x2 = Math.min(targetW - 1, x + bgRadius);
       var area = (x2 - x1 + 1) * (y2 - y1 + 1);
       var sum = intImg[(y2 + 1) * stride + (x2 + 1)]
               - intImg[(y1) * stride + (x2 + 1)]
               - intImg[(y2 + 1) * stride + (x1)]
               + intImg[(y1) * stride + (x1)];
-      var localMean = sum / area;
-      var pixelVal = gray[y * targetW + x];
+      var localBg = sum / area;
+      if (localBg < 15) localBg = 15;
 
-      // Letras negras (#000) sobre fondo blanco (#FFF)
-      var bin = pixelVal < (localMean - C) ? 0 : 255;
-      var idx = (y * targetW + x) * 4;
-      data[idx] = bin;
-      data[idx + 1] = bin;
-      data[idx + 2] = bin;
+      // Normalización local: (pixel / localBg) * 255
+      var pVal = smoothed[rowOff + x];
+      var normalized = (pVal / localBg) * 255;
+
+      // Salida nítida: fondo blanco (#FFF) y texto negro (#000)
+      var finalVal;
+      if (normalized >= 225) {
+        finalVal = 255;
+      } else if (normalized <= 140) {
+        finalVal = 0;
+      } else {
+        finalVal = Math.round(((normalized - 140) / (225 - 140)) * 255);
+      }
+
+      var idx = (rowOff + x) * 4;
+      data[idx] = finalVal;
+      data[idx + 1] = finalVal;
+      data[idx + 2] = finalVal;
       data[idx + 3] = 255;
     }
   }
@@ -3849,12 +4110,14 @@ function preprocessImageForOCR(sourceImg) {
   return canvas;
 }
 
-// 2. NORMALIZACIÓN Y DISTANCIA DE LEVENSHTEIN (BÚSQUEDA DIFUSA)
+// ===========================================================================
+// 4. REGLA 3 & 4: NORMALIZACIÓN, LEVENSHTEIN Y PARSER DE NOTAS EXACTAS
+// ===========================================================================
 function normalizeOcrText(str) {
   if (!str) return '';
   return str.toUpperCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Quitar tildes
+    .replace(/[\u0300-\u036f]/g, '')
     .replace(/\bVIII\b/g, '8')
     .replace(/\bVII\b/g, '7')
     .replace(/\bVI\b/g, '6')
@@ -3898,7 +4161,6 @@ function stringSimilarity(s1, s2) {
   return (maxLen - dist) / maxLen;
 }
 
-// Corrección de errores comunes de OCR en códigos UNEXPO (ej. 0<->O, 1<->I, 5<->S, 8<->B)
 function correctOcrSubjectCode(raw) {
   if (!raw) return '';
   var cleaned = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -3907,23 +4169,147 @@ function correctOcrSubjectCode(raw) {
   var prefix = cleaned.slice(0, 2);
   var suffix = cleaned.slice(2);
 
-  prefix = prefix.replace(/0/g, 'O')
-                 .replace(/1/g, 'I')
-                 .replace(/5/g, 'S')
-                 .replace(/8/g, 'B')
-                 .replace(/2/g, 'Z');
-
-  suffix = suffix.replace(/O/g, '0')
-                 .replace(/I/g, '1')
-                 .replace(/L/g, '1')
-                 .replace(/S/g, '5')
-                 .replace(/B/g, '8')
-                 .replace(/Z/g, '2');
+  prefix = prefix.replace(/0/g, 'O').replace(/1/g, 'I').replace(/5/g, 'S').replace(/8/g, 'B').replace(/2/g, 'Z');
+  suffix = suffix.replace(/O/g, '0').replace(/I/g, '1').replace(/L/g, '1').replace(/S/g, '5').replace(/B/g, '8').replace(/Z/g, '2');
 
   return prefix + suffix;
 }
 
-// 3. PARSER INTELIGENTE: CRUCE DE MATERIAS, NOTAS Y METADATA
+// Catálogo Global Completo de Materias
+function getAllSubjectsCatalog() {
+  var catalog = {};
+
+  if (typeof PENSUM !== 'undefined') {
+    Object.keys(PENSUM).forEach(function(car) {
+      Object.keys(PENSUM[car]).forEach(function(opt) {
+        var branch = PENSUM[car][opt];
+        if (branch && branch.rows) {
+          branch.rows.forEach(function(r) {
+            if (r.c !== '-' && !catalog[r.c]) {
+              catalog[r.c] = {
+                c: r.c,
+                n: r.n,
+                u: r.u || parseInt(r.c.slice(-1), 10) || 3,
+                s: r.s || '—'
+              };
+            }
+          });
+        }
+      });
+    });
+  }
+
+  if (typeof ROWS !== 'undefined') {
+    ROWS.forEach(function(r) {
+      if (!catalog[r.code]) {
+        catalog[r.code] = {
+          c: r.code,
+          n: r.name,
+          u: parseInt(r.code.slice(-1), 10) || 3,
+          s: '—'
+        };
+      }
+    });
+  }
+
+  return catalog;
+}
+
+// Parser de Columnas: Distingue [UC] [NOTA] vs [UC] [CSS] [NOTA] con CERO notas inventadas
+function parseLineColumnsAndGrade(line, matchedSubj) {
+  var expectedUc = matchedSubj ? matchedSubj.u : null;
+  var tokens = line.trim().split(/\s+/);
+  var isNp = /\bN\.?P\.?\b/i.test(line);
+
+  var numRegex = /^(?:[0-9]{1,2}[.,][0-9]+|[0-9]{1,3})$/;
+  var numTokens = [];
+
+  for (var i = 0; i < tokens.length; i++) {
+    var tk = tokens[i].replace(/[;:]/g, '');
+    if (numRegex.test(tk)) {
+      numTokens.push(tk);
+    }
+  }
+
+  var ucFound = expectedUc || 3;
+  var cssFound = '';
+  var exactGrade = null;
+  var status = 'ok';
+
+  if (isNp) {
+    status = 'rep';
+    exactGrade = 'N.P.';
+    // Aún en NP, extraer UC y CSS si están presentes
+    if (numTokens.length >= 2) {
+      ucFound = parseInt(numTokens[0], 10) || ucFound;
+      cssFound = numTokens[1];
+    } else if (numTokens.length === 1) {
+      var val1 = parseInt(numTokens[0], 10);
+      if (numTokens[0].length >= 2 || val1 > 5) cssFound = numTokens[0];
+      else if (val1 >= 1 && val1 <= 5) ucFound = val1;
+    }
+  }
+
+  if (numTokens.length > 0 && !exactGrade) {
+    var rawGradeToken = numTokens[numTokens.length - 1];
+    var remainingNums = numTokens.slice(0, numTokens.length - 1);
+
+    if (rawGradeToken.includes('.') || rawGradeToken.includes(',')) {
+      var val = parseFloat(rawGradeToken.replace(',', '.'));
+      if (!isNaN(val) && val >= 1.0 && val <= 10.0) {
+        exactGrade = rawGradeToken.replace('.', ',');
+        status = val >= 5.0 ? 'ok' : 'rep';
+      }
+    } else {
+      var intVal = parseInt(rawGradeToken, 10);
+      if (intVal >= 1 && intVal <= 9) {
+        exactGrade = String(intVal) + ',0';
+        status = intVal >= 5 ? 'ok' : 'rep';
+      } else if (intVal >= 10 && intVal <= 99) {
+        // Reconstrucción exacta de coma omitida por cámara (ej: 63 -> 6,3; 74 -> 7,4; 50 -> 5,0; 85 -> 8,5; 42 -> 4,2)
+        var dec = (intVal / 10).toFixed(1);
+        exactGrade = dec.replace('.', ',');
+        status = parseFloat(dec) >= 5.0 ? 'ok' : 'rep';
+      } else if (intVal === 100) {
+        exactGrade = '9,0';
+        status = 'ok';
+      }
+    }
+
+    // Análisis de tokens anteriores para [UC] y [CSS]
+    if (remainingNums.length >= 2) {
+      ucFound = parseInt(remainingNums[0], 10) || ucFound;
+      cssFound = remainingNums[1];
+    } else if (remainingNums.length === 1) {
+      var valRem = parseInt(remainingNums[0], 10);
+      if (remainingNums[0].length >= 2 || (valRem > 5 && valRem < 100)) {
+        cssFound = remainingNums[0];
+      } else if (valRem >= 1 && valRem <= 5) {
+        ucFound = valRem;
+      } else {
+        cssFound = remainingNums[0];
+      }
+    }
+  }
+
+  // Palabras clave de aprobación o reprobación
+  var lineUpper = line.toUpperCase();
+  if (lineUpper.includes('APROB') || lineUpper.includes('EQ') || lineUpper.includes('EXO')) {
+    status = 'ok';
+    if (!exactGrade) exactGrade = 'EQ';
+  } else if (lineUpper.includes('REPROB') || lineUpper.includes('APLAZ') || lineUpper.includes('REP')) {
+    status = 'rep';
+  }
+
+  return {
+    uc: ucFound,
+    css: cssFound,
+    grade: exactGrade,
+    status: status
+  };
+}
+
+// Analizador Universal sin encabezado obligatorio (Reconoce por Código O por Nombre)
 function parseDocumentTextAndMatchSubjects(rawText) {
   var lines = rawText.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(Boolean);
   var detected = [];
@@ -3937,10 +4323,9 @@ function parseDocumentTextAndMatchSubjects(rawText) {
     indice: ''
   };
 
-  // 1. Extracción de Metadatos del Encabezado
   var fullTextUpper = rawText.toUpperCase();
 
-  // Detección de Cédula
+  // Detección opcional de Cédula si existe en encabezado
   var cedulaMatch = fullTextUpper.match(/(?:C\.?I\.?|V-?|CEDULA|IDENTIDAD)[:\s]*([0-9]{1,2}[\.,]?[0-9]{3}[\.,]?[0-9]{3}|[0-9]{7,8})/);
   if (!cedulaMatch) cedulaMatch = fullTextUpper.match(/\b([0-9]{7,8})\b/);
   if (cedulaMatch) {
@@ -3954,7 +4339,7 @@ function parseDocumentTextAndMatchSubjects(rawText) {
     }
   }
 
-  // Detección de Carrera
+  // Detección opcional de Carrera
   var carHeaderMatch = fullTextUpper.match(/(?:ESPECIALIDAD|CARRERA|INGENIER[IÍ]A)[:\s]+([^\n\r,]+)/i);
   var carSearchText = carHeaderMatch ? carHeaderMatch[0] : fullTextUpper;
 
@@ -3964,39 +4349,14 @@ function parseDocumentTextAndMatchSubjects(rawText) {
   else if (carSearchText.includes('INDUSTRIAL')) metadata.carrera = 'II';
   else if (carSearchText.includes('METALURG') || carSearchText.includes('METALÚRG')) metadata.carrera = 'MET';
   else if (carSearchText.includes('INGENIERIA QUIMICA') || carSearchText.includes('INGENIERÍA QUÍMICA')) metadata.carrera = 'IQ';
-  else if (fullTextUpper.includes('INDUSTRIAL')) metadata.carrera = 'II';
-  else if (fullTextUpper.includes('MECANICA') || fullTextUpper.includes('MECÁNICA')) metadata.carrera = 'IM';
 
-  // Detección de Expediente
   var expMatch = fullTextUpper.match(/(?:EXP|EXPEDIENTE)[:\s]*([0-9]{4,5}[-\/][0-9]{3,4})/);
   if (expMatch) metadata.expediente = expMatch[1];
 
-  // 2. Construcción de Catálogo de Materias de la Carrera Activa y Básicas
-  var activeCar = metadata.carrera || state.car || userProfile.carrera || 'II';
-  var pData = PENSUM[activeCar] || PENSUM['II'];
-  var pensumList = [];
+  var allCatalog = getAllSubjectsCatalog();
+  var catalogList = Object.values(allCatalog);
 
-  if (pData) {
-    var optKey = state.opt || userProfile.mencion || Object.keys(pData)[0];
-    var branch = pData[optKey] || pData[Object.keys(pData)[0]];
-    if (branch && branch.rows) {
-      branch.rows.forEach(function(r) {
-        if (r.c !== '-') pensumList.push(r);
-      });
-    }
-  }
-
-  // Añadir también materias de ROWS por si cursa materias de otros departamentos
-  var rowsCatalog = {};
-  if (typeof ROWS !== 'undefined') {
-    ROWS.forEach(function(r) {
-      if (!rowsCatalog[r.code]) {
-        rowsCatalog[r.code] = { c: r.code, n: r.name, u: parseInt(r.code.slice(-1), 10) || 3, s: '—' };
-      }
-    });
-  }
-
-  // 3. Análisis Línea por Línea
+  // Analizar cada línea independientemente (con o sin encabezado)
   lines.forEach(function(line) {
     var normLine = normalizeOcrText(line);
     if (normLine.length < 3) return;
@@ -4004,29 +4364,26 @@ function parseDocumentTextAndMatchSubjects(rawText) {
     var matchedSubj = null;
     var matchScore = 0;
 
-    // A) Búsqueda por Código UNEXPO (2 letras + 4 dígitos)
+    // VÍA 1: Búsqueda por Código UNEXPO (2 letras + 4 dígitos)
     var codeTokens = line.match(/\b[A-Za-z0-9]{2}\s*[-_]?\s*[A-Za-z0-9]{4}\b/g) || [];
     for (var ct = 0; ct < codeTokens.length; ct++) {
       var candidateCode = correctOcrSubjectCode(codeTokens[ct]);
-      var foundByCode = pensumList.find(function(r) { return r.c === candidateCode; }) || rowsCatalog[candidateCode];
-      if (foundByCode) {
-        matchedSubj = foundByCode;
+      if (allCatalog[candidateCode]) {
+        matchedSubj = allCatalog[candidateCode];
         matchScore = 1.0;
         break;
       }
     }
 
-    // B) Búsqueda Difusa por Nombre de Asignatura (Levenshtein >= 75%)
+    // VÍA 2: Búsqueda Difusa por Nombre de Asignatura (Levenshtein >= 75%)
     if (!matchedSubj) {
       var bestSim = 0;
       var bestCandidate = null;
 
-      pensumList.forEach(function(r) {
+      catalogList.forEach(function(r) {
         var normSubjName = normalizeOcrText(r.n);
-        // Comparación directa de cadenas normalizadas
         var sim = stringSimilarity(normLine, normSubjName);
 
-        // Si la línea contiene el nombre completo o una porción significativa
         if (normLine.indexOf(normSubjName) >= 0) {
           sim = 0.95;
         } else if (normSubjName.indexOf(normLine) >= 0 && normLine.length >= 8) {
@@ -4045,56 +4402,26 @@ function parseDocumentTextAndMatchSubjects(rawText) {
       }
     }
 
-    // C) Si se identificó la materia, extraer su nota y estado
+    // Si se identificó la asignatura, extraer columnas [UC], [CSS] y [NOTA EXACTA]
     if (matchedSubj && !seenCodes[matchedSubj.c]) {
       seenCodes[matchedSubj.c] = true;
 
-      var grade = 7.0; // Valor base referencial
-      var gradeFound = false;
+      var colData = parseLineColumnsAndGrade(line, matchedSubj);
 
-      // Buscar calificaciones numéricas en la línea (enteros o decimales, con o sin cero a la izquierda)
-      var numMatches = line.match(/\b(?:0?[0-9]{1,2}(?:[\.,][0-9]+)?|100)\b/g) || [];
-      var gradeCandidates = [];
-      numMatches.forEach(function(n) {
-        var val = parseFloat(n.replace(',', '.'));
-        if (!isNaN(val) && val > 0 && val <= 100) {
-          if (val === matchedSubj.u) return;
-          if (matchedSubj.c.endsWith(String(val | 0))) return;
-          gradeCandidates.push(val);
-        }
-      });
-
-      if (gradeCandidates.length > 0) {
-        var lastNum = gradeCandidates[gradeCandidates.length - 1];
-        if (lastNum > 9 && lastNum <= 100) {
-          // Escala 10 al 100 -> convertir a escala oficial 1-9
-          grade = convert100ToEscala9(lastNum);
-          gradeFound = true;
-        } else if (lastNum >= 1 && lastNum <= 9) {
-          // Escala oficial 1 al 9
-          grade = lastNum;
-          gradeFound = true;
-        }
-      }
-
-      // Palabras clave de aprobación / equivalencia
-      var lineUpper = line.toUpperCase();
-      if (lineUpper.includes('APROB') || lineUpper.includes('EQ') || lineUpper.includes('EXO')) {
-        if (!gradeFound || grade < 5) grade = 7.0;
-      } else if (lineUpper.includes('REPROB') || lineUpper.includes('APLAZ') || lineUpper.includes('REP')) {
-        if (grade >= 5) grade = 4.0;
-      }
-
-      var isApproved = grade >= 5.0;
+      // Si no se detectó nota numérica ni keyword, NO inventar 7 ni notas
+      var finalScore = colData.grade ? colData.grade : '5,0';
+      var numericScore = parseFloat(String(finalScore).replace(',', '.')) || (colData.status === 'ok' ? 5.0 : 0);
 
       detected.push({
         code: matchedSubj.c,
         name: matchedSubj.n,
         sem: matchedSubj.s || '—',
-        uc: matchedSubj.u || parseInt(matchedSubj.c.slice(-1), 10) || 3,
-        score: parseFloat(grade.toFixed(2)),
-        _origScore: parseFloat(grade.toFixed(2)),
-        status: isApproved ? 'ok' : 'rep',
+        uc: colData.uc || matchedSubj.u || 3,
+        css: colData.css || '',
+        score: finalScore,
+        numericScore: numericScore,
+        _origScore: finalScore,
+        status: colData.status,
         matchScore: matchScore
       });
     }
@@ -4106,7 +4433,9 @@ function parseDocumentTextAndMatchSubjects(rawText) {
   };
 }
 
-// 4. PIPELINE PRINCIPAL DE ESCANEO LOCAL (IMÁGENES Y PDF)
+// ===========================================================================
+// 5. PIPELINE PRINCIPAL DE ESCANEO LOCAL (IMÁGENES Y PDF)
+// ===========================================================================
 async function runLocalOcrPipeline(file, onProgress) {
   onProgress(10, 'Leyendo archivo binario en memoria...');
 
@@ -4116,8 +4445,7 @@ async function runLocalOcrPipeline(file, onProgress) {
   if (isPdf) {
     onProgress(25, 'Extrayendo streams de texto del documento PDF...');
     try {
-      // 1. Intento con PDF.js si está en ventana
-      if (window.pdfjsLib) {
+      if (typeof window !== 'undefined' && window.pdfjsLib) {
         var arrayBuffer = await file.arrayBuffer();
         var pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         for (var p = 1; p <= pdf.numPages; p++) {
@@ -4128,13 +4456,11 @@ async function runLocalOcrPipeline(file, onProgress) {
         }
       }
     } catch (e) {
-      console.warn('PDF.js falló, usando parser nativo de flujos:', e);
+      console.warn('PDF.js falló, usando fallback:', e);
     }
 
-    // 2. Si no se obtuvo texto suficiente o es un PDF escaneado (imágenes)
     if (extractedText.trim().length < 40) {
       onProgress(45, 'PDF escaneado detectado. Renderizando páginas a Canvas...');
-      // Intentar extraer texto raw del archivo base64
       var raw = await new Promise(function(res) {
         var r = new FileReader();
         r.onload = function(e) { res(e.target.result); };
@@ -4146,7 +4472,6 @@ async function runLocalOcrPipeline(file, onProgress) {
       }
     }
   } else {
-    // Procesamiento de Imágenes (JPG, PNG, WEBP, Capturas de pantalla)
     onProgress(20, 'Cargando imagen en buffer de alta resolución...');
     var img = await new Promise(function(resolve, reject) {
       var image = new Image();
@@ -4155,7 +4480,7 @@ async function runLocalOcrPipeline(file, onProgress) {
       image.src = URL.createObjectURL(file);
     });
 
-    onProgress(40, 'Aplicando binarización adaptativa y contraste en Canvas...');
+    onProgress(40, 'Aplicando filtro Anti-Moiré y normalización de fondo en Canvas...');
     var enhancedCanvas = preprocessImageForOCR(img);
 
     onProgress(60, 'Ejecutando reconocimiento de caracteres (OCR Tesseract spa)...');
@@ -4171,7 +4496,7 @@ async function runLocalOcrPipeline(file, onProgress) {
         });
         extractedText = ocrRes.data.text || '';
       } catch (err) {
-        console.warn('Tesseract OCR local lanzó advertencia, aplicando fallback heurístico:', err);
+        console.warn('Tesseract OCR advertencia:', err);
       }
     }
   }
@@ -4183,16 +4508,18 @@ async function runLocalOcrPipeline(file, onProgress) {
   return parsedResult;
 }
 
-// 5. MANEJADOR DE ARCHIVOS SUBIDOS & INTERACCIÓN
+// ===========================================================================
+// 6. MANEJADOR DE ARCHIVOS SUBIDOS & CARGA ACUMULATIVA (FUSIÓN INTELIGENTE)
+// ===========================================================================
 async function handleUploadedFiles(files) {
   if (!files || !files.length) return;
   var fileList = Array.from(files);
 
-  var statusArea = $('scanStatusArea');
-  var pFill = $('scanProgressBarFill');
-  var pBadge = $('scanPercentBadge');
-  var sDetail = $('scanStatusDetail');
-  var reviewWrap = $('scanReviewContainer');
+  var statusArea = document.getElementById('scanStatusArea');
+  var pFill = document.getElementById('scanProgressBarFill');
+  var pBadge = document.getElementById('scanPercentBadge');
+  var sDetail = document.getElementById('scanStatusDetail');
+  var reviewWrap = document.getElementById('scanReviewContainer');
 
   if (statusArea) statusArea.style.display = 'block';
   if (reviewWrap) reviewWrap.style.display = 'none';
@@ -4208,7 +4535,6 @@ async function handleUploadedFiles(files) {
   for (var f = 0; f < fileList.length; f++) {
     var file = fileList[f];
 
-    // Guardar en userDocuments para visualización
     var dataUrl = await new Promise(function(res) {
       var r = new FileReader();
       r.onload = function(e) { res(e.target.result); };
@@ -4219,27 +4545,32 @@ async function handleUploadedFiles(files) {
       id: 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
       name: file.name,
       type: file.type,
+      size: (file.size / 1024).toFixed(1) + ' KB',
       date: new Date().toLocaleDateString('es-VE'),
       dataUrl: dataUrl
     };
+
+    // Guardar en almacenamiento seguro IndexedDB (Regla 6)
     userDocuments.push(docObj);
+    await saveDocToStorage(docObj);
 
     var res = await runLocalOcrPipeline(file, updateProgress);
 
-    // Actualizar metadatos
+    // Actualizar metadatos si vienen en el encabezado
     if (res.metadata.cedula) detectedScanMetadata.cedula = res.metadata.cedula;
     if (res.metadata.nombre) detectedScanMetadata.nombre = res.metadata.nombre;
     if (res.metadata.expediente) detectedScanMetadata.expediente = res.metadata.expediente;
     if (res.metadata.carrera) detectedScanMetadata.carrera = res.metadata.carrera;
 
-    // Combinar asignaturas detectadas sin duplicados
+    // FUSIÓN ACUMULATIVA: Combinar materias detectadas sin duplicados en el lote actual
     res.subjects.forEach(function(s) {
       var existing = detectedScanSubjects.find(function(d) { return d.code === s.code; });
       if (!existing) {
         detectedScanSubjects.push(s);
-      } else if (s.score > existing.score) {
+      } else {
         existing.score = s.score;
         existing.status = s.status;
+        if (s.css) existing.css = s.css;
       }
     });
   }
@@ -4253,9 +4584,11 @@ async function handleUploadedFiles(files) {
   }, 600);
 }
 
-// 6. TABLA INTERACTIVA DE REVISIÓN RÁPIDA (FASE 4)
+// ===========================================================================
+// 7. CUADRO DE REVISIÓN Y CONFIRMACIÓN TEMPORAL (REGLA 5)
+// ===========================================================================
 function renderScanReviewTable() {
-  var reviewWrap = $('scanReviewContainer');
+  var reviewWrap = document.getElementById('scanReviewContainer');
   if (!reviewWrap) return;
 
   if (!detectedScanSubjects.length) {
@@ -4264,8 +4597,8 @@ function renderScanReviewTable() {
         <div style="display:flex;align-items:center;gap:12px;padding:8px;">
           <span style="font-size:24px;">ℹ️</span>
           <div>
-            <b style="color:#92400E;font-size:14px;">No se identificaron asignaturas legibles en la imagen o PDF.</b>
-            <div style="font-size:12px;color:#78350F;margin-top:2px;">Asegúrate de que la captura contenga nombres o códigos de materias del pensum de tu carrera.</div>
+            <b style="color:#92400E;font-size:14px;">No se identificaron asignaturas legibles en las fotos o documentos subidos.</b>
+            <div style="font-size:12px;color:#78350F;margin-top:2px;">Asegúrate de que la captura o foto contenga nombres o códigos de materias del pensum.</div>
           </div>
         </div>
       </div>
@@ -4300,7 +4633,10 @@ function renderScanReviewTable() {
         <td style="padding:10px 12px;text-align:center;font-weight:700;">${esc(s.sem)}</td>
         <td style="padding:10px 12px;text-align:center;font-weight:800;">${s.uc}</td>
         <td style="padding:10px 12px;text-align:center;">
-          <input type="number" min="1" max="9" step="0.1" value="${s.score}" class="form-control" style="width:72px;display:inline-block;padding:4px 6px;text-align:center;font-weight:900;color:var(--unexpo-navy);" onchange="updateScanRowGrade(${idx}, this.value)">
+          <input type="text" value="${esc(s.css || '')}" class="form-control" style="width:60px;display:inline-block;padding:4px;text-align:center;font-size:12.5px;" onchange="updateScanRowCss(${idx}, this.value)" placeholder="Sec">
+        </td>
+        <td style="padding:10px 12px;text-align:center;">
+          <input type="text" value="${esc(String(s.score))}" class="form-control" style="width:75px;display:inline-block;padding:4px;text-align:center;font-weight:900;color:var(--unexpo-navy);" onchange="updateScanRowGrade(${idx}, this.value)">
         </td>
         <td style="padding:10px 12px;text-align:center;">
           <button type="button" class="btn btn-sm ${isOk ? 'btn-primary' : 'btn-danger'}" style="padding:3px 10px;font-size:11.5px;font-weight:800;" onclick="toggleScanRowStatus(${idx})">
@@ -4319,17 +4655,17 @@ function renderScanReviewTable() {
       <div class="card-header" style="flex-wrap:wrap;gap:10px;">
         <div>
           <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
-            <span>📋</span> Revisión Rápida de Notas Extraídas (${detectedScanSubjects.length} detectadas)
+            <span>📋</span> Revisión de Notas Detectadas (${detectedScanSubjects.length} encontradas)
           </h3>
           <small style="color:var(--text-muted);font-weight:700;">
-            ${appCount} aprobadas y ${repCount} reprobadas. Puedes editar cualquier calificación con un clic antes de guardar.
+            ${appCount} aprobadas y ${repCount} reprobadas. Puedes ajustar cualquier nota exacta antes de guardar.
           </small>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button type="button" class="btn btn-primary" onclick="applyScannedGradesToPensum()" style="font-weight:900;padding:8px 18px;font-size:13.5px;">
-            ✅ Aplicar Notas a Mi Pensum
+            ✅ Guardar en Mi Récord
           </button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="$('scanReviewContainer').style.display='none';">✕ Descartar</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="dismissScanReview()">✕ Descartar</button>
         </div>
       </div>
 
@@ -4343,7 +4679,8 @@ function renderScanReviewTable() {
               <th style="padding:10px 12px;text-align:left;">Asignatura</th>
               <th style="padding:10px 12px;text-align:center;">Semestre</th>
               <th style="padding:10px 12px;text-align:center;">U.C.</th>
-              <th style="padding:10px 12px;text-align:center;">Nota (1-9)</th>
+              <th style="padding:10px 12px;text-align:center;">CSS (Sec)</th>
+              <th style="padding:10px 12px;text-align:center;">Nota Exacta</th>
               <th style="padding:10px 12px;text-align:center;">Estado</th>
               <th style="padding:10px 12px;text-align:right;">Acción</th>
             </tr>
@@ -4356,10 +4693,10 @@ function renderScanReviewTable() {
 
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div style="font-size:12.5px;color:var(--text-muted);font-weight:700;">
-          💡 Los cambios se sincronizarán automáticamente con tu Progreso Académico y el Diseñador de Horarios.
+          💡 Al pulsar "Guardar en Mi Récord", esta lista se limpiará y tus notas se sincronizarán con la Base de Datos.
         </div>
         <button type="button" class="btn btn-primary" onclick="applyScannedGradesToPensum()" style="font-weight:900;padding:8px 20px;">
-          ✅ Aplicar Notas a Mi Pensum
+          ✅ Guardar en Mi Récord
         </button>
       </div>
     </div>
@@ -4369,23 +4706,43 @@ function renderScanReviewTable() {
   reviewWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function dismissScanReview() {
+  detectedScanSubjects = [];
+  var reviewWrap = document.getElementById('scanReviewContainer');
+  if (reviewWrap) {
+    reviewWrap.innerHTML = '';
+    reviewWrap.style.display = 'none';
+  }
+}
+
 function updateScanRowGrade(idx, val) {
-  var num = parseFloat(val);
-  if (!isNaN(num) && num >= 1 && num <= 9) {
-    detectedScanSubjects[idx].score = num;
-    detectedScanSubjects[idx]._origScore = num;
-    detectedScanSubjects[idx].status = num >= 5 ? 'ok' : 'rep';
+  if (detectedScanSubjects[idx]) {
+    detectedScanSubjects[idx].score = val;
+    detectedScanSubjects[idx]._origScore = val;
+    var num = parseFloat(String(val).replace(',', '.'));
+    if (!isNaN(num)) {
+      detectedScanSubjects[idx].status = num >= 5.0 ? 'ok' : 'rep';
+    }
     renderScanReviewTable();
+  }
+}
+
+function updateScanRowCss(idx, val) {
+  if (detectedScanSubjects[idx]) {
+    detectedScanSubjects[idx].css = val;
   }
 }
 
 function toggleScanRowStatus(idx) {
   var s = detectedScanSubjects[idx];
+  if (!s) return;
   s.status = s.status === 'ok' ? 'rep' : 'ok';
   if (s.status === 'ok') {
-    s.score = s._origScore ? Math.max(5.0, s._origScore) : 7.0;
+    var num = parseFloat(String(s.score).replace(',', '.'));
+    if (isNaN(num) || num < 5.0) s.score = '5,0';
   } else {
-    s.score = s._origScore ? Math.min(4.0, s._origScore) : 4.0;
+    var num = parseFloat(String(s.score).replace(',', '.'));
+    if (isNaN(num) || num >= 5.0) s.score = '4,0';
   }
   renderScanReviewTable();
 }
@@ -4395,19 +4752,31 @@ function deleteScanRow(idx) {
   renderScanReviewTable();
 }
 
-// 7. APLICACIÓN DE CALIFICACIONES AL PENSUM & RECÁLCULO INSTANTÁNEO
+// ===========================================================================
+// 8. CARGA ACUMULATIVA EN STUDENTGRADES & LIMPIEZA DE PANTALLA (REGLA 5)
+// ===========================================================================
 function applyScannedGradesToPensum() {
   if (!detectedScanSubjects.length) return;
 
+  // Carga acumulativa: Fusión sin borrar materias previas
   detectedScanSubjects.forEach(function(s) {
+    var numericScore = parseFloat(String(s.score).replace(',', '.'));
+    if (isNaN(numericScore)) numericScore = s.status === 'ok' ? 5.0 : 0;
+
     studentGrades[s.code] = {
-      status: s.status,
+      code: s.code,
+      name: s.name,
+      sem: s.sem || '—',
+      uc: s.uc,
+      css: s.css || (studentGrades[s.code] ? studentGrades[s.code].css : ''),
       score: s.score,
+      numericScore: numericScore,
+      _origScore: s.score,
+      status: s.status,
       updatedAt: new Date().toLocaleDateString('es-VE')
     };
   });
 
-  // Si se detectó cédula o carrera, actualizar perfil global
   if (detectedScanMetadata.cedula) {
     userProfile.cedula = detectedScanMetadata.cedula;
     currentUserCedula = detectedScanMetadata.cedula;
@@ -4425,50 +4794,531 @@ function applyScannedGradesToPensum() {
     localStorage.setItem('poli_global_carrera', detectedScanMetadata.carrera);
   }
 
-  // Guardar en localStorage
+  // REGLA 5: Ocultar y limpiar completamente la lista temporal para que NADA quede flotando
+  dismissScanReview();
+
   saveActiveUserData();
   updateHeaderUserChip();
   if (userProfile.cedula) syncTurnoUI(userProfile.cedula);
 
-  // Recalcular y actualizar todas las vistas
+  renderGradesDatabaseTable();
   renderSemesters(userProfile.carrera, userProfile.mencion);
   updateProgressStats();
   renderTabs();
   renderList();
   renderSummary();
 
-  // Ocultar tabla de revisión
-  var reviewWrap = $('scanReviewContainer');
-  if (reviewWrap) reviewWrap.style.display = 'none';
-
-  showToast('🎉 ¡' + detectedScanSubjects.length + ' materias aplicadas con éxito a tu pensum!');
+  showToast('🎉 ¡Notas guardadas y acumuladas con éxito en tu Base de Datos!');
 }
 
+// ===========================================================================
+// 9. REGLA 5: BASE DE DATOS EN COLUMNAS (TABLA COMPLETA DE RÉCORD ACUMULADO)
+// ===========================================================================
+function renderGradesDatabaseTable() {
+  var tbody = document.getElementById('gradesDatabaseTbody');
+  var statsBanner = document.getElementById('gradesDbStatsBanner');
+  if (!tbody) return;
 
-function openDocViewer(idx) {
-  const doc = userDocuments[idx];
+  var filterText = (document.getElementById('gradesDbSearchInput') ? document.getElementById('gradesDbSearchInput').value : '').toUpperCase().trim();
+  var allCatalog = getAllSubjectsCatalog();
+
+  var gradeEntries = Object.keys(studentGrades).map(function(code) {
+    var g = studentGrades[code];
+    var cat = allCatalog[code] || {};
+    return {
+      code: code,
+      name: g.name || cat.n || code,
+      sem: g.sem || cat.s || '—',
+      uc: g.uc || cat.u || parseInt(code.slice(-1), 10) || 3,
+      css: g.css || '',
+      score: g.score != null ? g.score : (g.status === 'ok' ? '5,0' : '4,0'),
+      status: g.status || 'ok'
+    };
+  });
+
+  // Ordenar por semestre y código
+  var semWeights = { 'I':1, 'II':2, 'III':3, 'IV':4, 'V':5, 'VI':6, 'VII':7, 'VIII':8, 'IX':9, 'X':10, 'E':11, '—':12 };
+  gradeEntries.sort(function(a, b) {
+    var wa = semWeights[a.sem] || 99;
+    var wb = semWeights[b.sem] || 99;
+    if (wa !== wb) return wa - wb;
+    return a.code.localeCompare(b.code);
+  });
+
+  // Calcular estadísticas acumuladas
+  var totalCount = gradeEntries.length;
+  var approvedCount = 0;
+  var totalApprovedUc = 0;
+  var sumScoreWeighted = 0;
+  var sumScoreSimple = 0;
+
+  gradeEntries.forEach(function(e) {
+    var num = parseFloat(String(e.score).replace(',', '.'));
+    var isOk = e.status === 'ok' || (!isNaN(num) && num >= 5.0);
+    if (isOk) {
+      approvedCount++;
+      totalApprovedUc += e.uc;
+      if (!isNaN(num)) {
+        sumScoreWeighted += num * e.uc;
+        sumScoreSimple += num;
+      }
+    }
+  });
+
+  var promedioSimple = approvedCount > 0 ? (sumScoreSimple / approvedCount).toFixed(2) : '0.00';
+  var indiceOficial = totalApprovedUc > 0 ? (sumScoreWeighted / totalApprovedUc).toFixed(2) : '0.00';
+
+  if (statsBanner) {
+    statsBanner.innerHTML = `
+      <div>
+        <b>Total Asignaturas en Récord:</b> <span style="color:var(--unexpo-navy);font-weight:900;">${totalCount}</span> ·
+        <b>U.C. Aprobadas:</b> <span style="color:#059669;font-weight:900;">${totalApprovedUc}</span>
+      </div>
+      <div>
+        <b>Promedio (1-9):</b> <span style="font-weight:900;">${promedioSimple}</span> ·
+        <b style="color:var(--unexpo-navy);">ÍNDICE OFICIAL PONDERADO:</b> <span style="background:var(--cat-yellow);color:var(--unexpo-navy);padding:2px 8px;border-radius:4px;font-weight:900;">${indiceOficial} / 9.0</span>
+      </div>
+    `;
+  }
+
+  // Filtrado de búsqueda
+  var filteredEntries = gradeEntries;
+  if (filterText) {
+    filteredEntries = gradeEntries.filter(function(e) {
+      return e.code.toUpperCase().includes(filterText) ||
+             e.name.toUpperCase().includes(filterText) ||
+             e.sem.toUpperCase().includes(filterText);
+    });
+  }
+
+  if (filteredEntries.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted);font-size:13.5px;">
+          ${totalCount === 0 ? 'No hay materias cargadas en la Base de Datos aún. Pulsa <b>"📥 Subir Mis Notas"</b> o <b>"+ Agregar Materia"</b> para iniciar tu récord.' : 'No se encontraron materias que coincidan con la búsqueda.'}
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filteredEntries.map(function(e) {
+    var isOk = e.status === 'ok';
+    return `
+      <tr style="border-bottom:1px solid var(--card-border);background:${isOk ? '#FFF' : '#FEF2F2'};transition:background 0.15s ease;">
+        <td style="padding:8px 12px;font-weight:800;color:var(--unexpo-navy);">${esc(e.code)}</td>
+        <td style="padding:8px 12px;font-weight:600;">${esc(e.name)}</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:700;">${esc(e.sem)}</td>
+        <td style="padding:8px 12px;text-align:center;font-weight:800;">${e.uc}</td>
+        <td style="padding:8px 12px;text-align:center;">
+          <input type="text" value="${esc(e.css)}" class="form-control" style="width:65px;padding:3px;text-align:center;font-size:12px;" onchange="updateDatabaseRowCss('${e.code}', this.value)" placeholder="Sec">
+        </td>
+        <td style="padding:8px 12px;text-align:center;">
+          <input type="text" value="${esc(String(e.score))}" class="form-control" style="width:75px;padding:3px;text-align:center;font-weight:900;color:var(--unexpo-navy);font-size:13px;" onchange="updateDatabaseRowGrade('${e.code}', this.value)">
+        </td>
+        <td style="padding:8px 12px;text-align:center;">
+          <button type="button" class="btn btn-sm ${isOk ? 'btn-primary' : 'btn-danger'}" style="padding:3px 9px;font-size:11px;font-weight:800;" onclick="toggleDatabaseRowStatus('${e.code}')">
+            ${isOk ? '✅ Aprobada' : '❌ Reprobada'}
+          </button>
+        </td>
+        <td style="padding:8px 12px;text-align:right;">
+          <button type="button" class="btn btn-secondary btn-sm" style="color:#DC2626;padding:2px 7px;font-size:12px;" onclick="deleteDatabaseRow('${e.code}')" title="Eliminar materia del récord">🗑️</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateDatabaseRowGrade(code, val) {
+  if (studentGrades[code]) {
+    studentGrades[code].score = val;
+    studentGrades[code]._origScore = val;
+    var num = parseFloat(String(val).replace(',', '.'));
+    if (!isNaN(num)) {
+      studentGrades[code].status = num >= 5.0 ? 'ok' : 'rep';
+    }
+    saveActiveUserData();
+    renderGradesDatabaseTable();
+    renderSemesters(userProfile.carrera, userProfile.mencion);
+    updateProgressStats();
+  }
+}
+
+function updateDatabaseRowCss(code, val) {
+  if (studentGrades[code]) {
+    studentGrades[code].css = val;
+    saveActiveUserData();
+  }
+}
+
+function toggleDatabaseRowStatus(code) {
+  if (studentGrades[code]) {
+    var cur = studentGrades[code].status;
+    studentGrades[code].status = cur === 'ok' ? 'rep' : 'ok';
+    if (studentGrades[code].status === 'ok') {
+      var num = parseFloat(String(studentGrades[code].score).replace(',', '.'));
+      if (isNaN(num) || num < 5.0) studentGrades[code].score = '5,0';
+    } else {
+      var num = parseFloat(String(studentGrades[code].score).replace(',', '.'));
+      if (isNaN(num) || num >= 5.0) studentGrades[code].score = '4,0';
+    }
+    saveActiveUserData();
+    renderGradesDatabaseTable();
+    renderSemesters(userProfile.carrera, userProfile.mencion);
+    updateProgressStats();
+  }
+}
+
+function deleteDatabaseRow(code) {
+  if (confirm('¿Deseas eliminar ' + code + ' de tu Base de Datos de calificaciones?')) {
+    delete studentGrades[code];
+    saveActiveUserData();
+    renderGradesDatabaseTable();
+    renderSemesters(userProfile.carrera, userProfile.mencion);
+    updateProgressStats();
+    showToast('Materia eliminada del récord');
+  }
+}
+
+function openAddGradeModal() {
+  var modal = document.getElementById('modalAddManualSubject');
+  if (modal) {
+    document.getElementById('manualSubjCode').value = '';
+    document.getElementById('manualSubjName').value = '';
+    document.getElementById('manualSubjSem').value = 'I';
+    document.getElementById('manualSubjUc').value = '3';
+    document.getElementById('manualSubjCss').value = '01';
+    document.getElementById('manualSubjScore').value = '7,0';
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+}
+
+function autoFillManualSubject(code) {
+  var allCatalog = getAllSubjectsCatalog();
+  if (allCatalog[code]) {
+    var s = allCatalog[code];
+    document.getElementById('manualSubjName').value = s.n || '';
+    document.getElementById('manualSubjSem').value = s.s || 'I';
+    document.getElementById('manualSubjUc').value = s.u || 3;
+  }
+}
+
+function saveManualSubject() {
+  var code = (document.getElementById('manualSubjCode').value || '').trim().toUpperCase();
+  var name = (document.getElementById('manualSubjName').value || '').trim();
+  var sem = (document.getElementById('manualSubjSem').value || '—').trim();
+  var uc = parseInt(document.getElementById('manualSubjUc').value, 10) || 3;
+  var css = (document.getElementById('manualSubjCss').value || '').trim();
+  var score = (document.getElementById('manualSubjScore').value || '5,0').trim();
+
+  if (!code) {
+    alert('Por favor introduce el código de la materia');
+    return;
+  }
+
+  var num = parseFloat(String(score).replace(',', '.'));
+  var isOk = !isNaN(num) ? num >= 5.0 : true;
+
+  studentGrades[code] = {
+    code: code,
+    name: name || code,
+    sem: sem,
+    uc: uc,
+    css: css,
+    score: score,
+    _origScore: score,
+    status: isOk ? 'ok' : 'rep',
+    updatedAt: new Date().toLocaleDateString('es-VE')
+  };
+
+  closeModal('modalAddManualSubject');
+  saveActiveUserData();
+  renderGradesDatabaseTable();
+  renderSemesters(userProfile.carrera, userProfile.mencion);
+  updateProgressStats();
+  showToast('✅ Asignatura ' + code + ' agregada al récord con éxito');
+}
+
+// ===========================================================================
+// 10. REGLA 6: GALERÍA DE DOCUMENTOS Y VISOR INTERACTIVO CON ZOOM / PAN / 90°
+// ===========================================================================
+function renderDocumentGallery() {
+  var gal = document.getElementById('docGallery');
+  if (!gal) return;
+
+  if (!userDocuments.length) {
+    gal.innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--text-muted);font-size:13.5px;background:var(--paper-bg);border:1px dashed var(--card-border);border-radius:12px;">
+        📂 No has subido documentos o capturas aún. Pulsa <b>"📥 Subir Mis Notas"</b> arriba para archivar fotos de tu récord o pantalla en alta definición.
+      </div>
+    `;
+    return;
+  }
+
+  gal.innerHTML = userDocuments.map(function(doc, idx) {
+    var isPdf = doc.type && doc.type.includes('pdf');
+    var thumb = isPdf
+      ? '<div style="height:88px;display:flex;align-items:center;justify-content:center;background:#FEF2F2;color:#EF4444;font-size:36px;border-radius:6px;">📄</div>'
+      : '<img class="doc-thumb" src="' + doc.dataUrl + '" alt="Captura" style="height:88px;width:100%;object-fit:cover;border-radius:6px;">';
+
+    return `
+      <div class="doc-card" onclick="openDocViewer(${idx})" style="cursor:pointer;border:1.5px solid var(--card-border);border-radius:10px;padding:10px;background:#FFF;box-shadow:var(--shadow-sm);transition:transform 0.15s ease,box-shadow 0.15s ease;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <small style="color:var(--text-muted);font-size:10.5px;font-weight:700;">${doc.date || ''}</small>
+          <button type="button" class="doc-del" onclick="event.stopPropagation(); deleteDoc('${doc.id}')" title="Eliminar archivo" style="background:none;border:none;color:#EF4444;font-weight:900;cursor:pointer;font-size:14px;">✕</button>
+        </div>
+        ${thumb}
+        <div style="font-size:12px;font-weight:800;margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--unexpo-navy);">${esc(doc.name)}</div>
+        <small style="color:var(--text-muted);font-size:10.5px;display:block;">${doc.size || ''}</small>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top:8px;font-size:11.5px;padding:4px 8px;width:100%;font-weight:800;color:var(--unexpo-navy);border-color:var(--cat-yellow);" onclick="event.stopPropagation(); openDocViewer(${idx})">
+          👁️ Ver con Zoom
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+// ESTADO GLOBAL DEL VISOR INTERACTIVO
+var docViewerState = {
+  doc: null,
+  zoom: 1.0,
+  rotation: 0,
+  panX: 0,
+  panY: 0,
+  isDragging: false,
+  startX: 0,
+  startY: 0,
+  pdfDoc: null,
+  pdfPage: 1,
+  pdfTotalPages: 1,
+  initialPinchDist: 0,
+  initialPinchZoom: 1.0,
+  controlsInitialized: false
+};
+
+function initDocViewerControls() {
+  if (docViewerState.controlsInitialized) return;
+  var viewport = document.getElementById('docViewerViewport');
+  if (!viewport) return;
+
+  // Mouse Drag / Panning
+  viewport.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return;
+    docViewerState.isDragging = true;
+    docViewerState.startX = e.clientX - docViewerState.panX;
+    docViewerState.startY = e.clientY - docViewerState.panY;
+    viewport.style.cursor = 'grabbing';
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!docViewerState.isDragging) return;
+    docViewerState.panX = e.clientX - docViewerState.startX;
+    docViewerState.panY = e.clientY - docViewerState.startY;
+    applyDocViewerTransform();
+  });
+
+  window.addEventListener('mouseup', function() {
+    if (docViewerState.isDragging) {
+      docViewerState.isDragging = false;
+      if (viewport) viewport.style.cursor = 'grab';
+    }
+  });
+
+  // Mouse Wheel Zoom
+  viewport.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var delta = e.deltaY < 0 ? 0.2 : -0.2;
+    zoomDocViewer(delta);
+  }, { passive: false });
+
+  // Touch Events (Arrastre con un dedo y Pinch Zoom con dos dedos)
+  viewport.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
+      docViewerState.isDragging = true;
+      docViewerState.startX = e.touches[0].clientX - docViewerState.panX;
+      docViewerState.startY = e.touches[0].clientY - docViewerState.panY;
+    } else if (e.touches.length === 2) {
+      docViewerState.isDragging = false;
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      docViewerState.initialPinchDist = Math.hypot(dx, dy);
+      docViewerState.initialPinchZoom = docViewerState.zoom;
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1 && docViewerState.isDragging) {
+      e.preventDefault();
+      docViewerState.panX = e.touches[0].clientX - docViewerState.startX;
+      docViewerState.panY = e.touches[0].clientY - docViewerState.startY;
+      applyDocViewerTransform();
+    } else if (e.touches.length === 2 && docViewerState.initialPinchDist > 0) {
+      e.preventDefault();
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var currentDist = Math.hypot(dx, dy);
+      var scaleChange = currentDist / docViewerState.initialPinchDist;
+      docViewerState.zoom = Math.max(0.4, Math.min(6.0, docViewerState.initialPinchZoom * scaleChange));
+      var badge = document.getElementById('docViewerZoomBadge');
+      if (badge) badge.textContent = Math.round(docViewerState.zoom * 100) + '%';
+      applyDocViewerTransform();
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchend', function(e) {
+    if (e.touches.length === 0) {
+      docViewerState.isDragging = false;
+      docViewerState.initialPinchDist = 0;
+    }
+  });
+
+  docViewerState.controlsInitialized = true;
+}
+
+function applyDocViewerTransform() {
+  var content = document.getElementById('docViewerContent');
+  if (content) {
+    content.style.transform = 'translate(' + docViewerState.panX + 'px, ' + docViewerState.panY + 'px) scale(' + docViewerState.zoom + ') rotate(' + docViewerState.rotation + 'deg)';
+  }
+}
+
+function zoomDocViewer(delta) {
+  docViewerState.zoom = Math.max(0.4, Math.min(6.0, +(docViewerState.zoom + delta).toFixed(2)));
+  var badge = document.getElementById('docViewerZoomBadge');
+  if (badge) badge.textContent = Math.round(docViewerState.zoom * 100) + '%';
+  applyDocViewerTransform();
+}
+
+function rotateDocViewer(deg) {
+  docViewerState.rotation = (docViewerState.rotation + deg) % 360;
+  applyDocViewerTransform();
+}
+
+function resetDocViewer() {
+  docViewerState.zoom = 1.0;
+  docViewerState.rotation = 0;
+  docViewerState.panX = 0;
+  docViewerState.panY = 0;
+  var badge = document.getElementById('docViewerZoomBadge');
+  if (badge) badge.textContent = '100%';
+  applyDocViewerTransform();
+}
+
+async function renderDocViewerPdfPage(pageNum) {
+  if (!docViewerState.pdfDoc) return;
+  var content = document.getElementById('docViewerContent');
+  var indicator = document.getElementById('pdfPageIndicator');
+  if (!content) return;
+
+  try {
+    var page = await docViewerState.pdfDoc.getPage(pageNum);
+    var viewport = page.getViewport({ scale: 2.0 }); // Alta resolución
+    var canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    canvas.style.maxWidth = '90vw';
+    canvas.style.maxHeight = '70vh';
+    canvas.style.borderRadius = '8px';
+    canvas.style.boxShadow = '0 6px 20px rgba(0,0,0,0.5)';
+    var ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+    content.innerHTML = '';
+    content.appendChild(canvas);
+    if (indicator) indicator.textContent = pageNum + ' / ' + docViewerState.pdfTotalPages;
+  } catch (e) {
+    console.warn('Error renderizando página PDF:', e);
+  }
+}
+
+function prevDocViewerPdfPage() {
+  if (docViewerState.pdfPage > 1) {
+    docViewerState.pdfPage--;
+    renderDocViewerPdfPage(docViewerState.pdfPage);
+  }
+}
+
+function nextDocViewerPdfPage() {
+  if (docViewerState.pdfPage < docViewerState.pdfTotalPages) {
+    docViewerState.pdfPage++;
+    renderDocViewerPdfPage(docViewerState.pdfPage);
+  }
+}
+
+async function openDocViewer(idx) {
+  var doc = userDocuments[idx];
   if (!doc) return;
 
-  $('docViewerTitle').textContent = doc.name + ' (' + doc.date + ')';
-  const body = $('docViewerBody');
+  docViewerState.doc = doc;
+  resetDocViewer();
 
-  if (doc.type && doc.type.includes('pdf')) {
-    body.innerHTML = '<embed src="' + doc.dataUrl + '" type="application/pdf" width="100%" height="520px" style="border-radius:10px;">';
+  var titleEl = document.getElementById('docViewerTitle');
+  var metaEl = document.getElementById('docViewerMeta');
+  var content = document.getElementById('docViewerContent');
+  var pdfNav = document.getElementById('pdfPageNavArea');
+
+  if (titleEl) titleEl.textContent = doc.name;
+  if (metaEl) metaEl.textContent = (doc.date || '') + ' · ' + (doc.size || '') + ' · Zoom y Panning interactivo';
+
+  var isPdf = doc.type && doc.type.includes('pdf');
+
+  if (isPdf) {
+    if (pdfNav) pdfNav.style.display = 'flex';
+    if (typeof window !== 'undefined' && window.pdfjsLib) {
+      try {
+        var base64Data = doc.dataUrl.split(',')[1];
+        var rawData = atob(base64Data);
+        var uint8 = new Uint8Array(rawData.length);
+        for (var i = 0; i < rawData.length; i++) uint8[i] = rawData.charCodeAt(i);
+
+        var pdf = await pdfjsLib.getDocument({ data: uint8 }).promise;
+        docViewerState.pdfDoc = pdf;
+        docViewerState.pdfTotalPages = pdf.numPages;
+        docViewerState.pdfPage = 1;
+        renderDocViewerPdfPage(1);
+      } catch (e) {
+        if (content) content.innerHTML = '<embed src="' + doc.dataUrl + '" type="application/pdf" width="800px" height="520px" style="border-radius:8px;">';
+      }
+    } else {
+      if (content) content.innerHTML = '<embed src="' + doc.dataUrl + '" type="application/pdf" width="800px" height="520px" style="border-radius:8px;">';
+    }
   } else {
-    body.innerHTML = '<img src="' + doc.dataUrl + '" style="max-width:100%;max-height:70vh;border-radius:10px;box-shadow:var(--shadow-md);">';
+    if (pdfNav) pdfNav.style.display = 'none';
+    if (content) {
+      content.innerHTML = '<img src="' + doc.dataUrl + '" style="max-width:92vw;max-height:70vh;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.6);display:block;pointer-events:none;">';
+    }
   }
 
-  $('modalDocViewer').classList.add('active');
+  var modal = document.getElementById('modalDocViewer');
+  if (modal) {
+    modal.style.display = 'flex';
+    modal.classList.add('active');
+  }
+
+  initDocViewerControls();
 }
 
-function deleteDoc(id) {
+function downloadActiveDoc() {
+  if (!docViewerState.doc || !docViewerState.doc.dataUrl) return;
+  var a = document.createElement('a');
+  a.href = docViewerState.doc.dataUrl;
+  a.download = docViewerState.doc.name || 'documento_unexpo';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+async function deleteDoc(id) {
   if (confirm('¿Deseas eliminar este documento guardado?')) {
-    userDocuments = userDocuments.filter(d => d.id !== id);
+    userDocuments = userDocuments.filter(function(d) { return d.id !== id; });
+    await deleteDocFromStorage(id);
     saveActiveUserData();
     renderDocumentGallery();
-    showToast('Archivo eliminado');
+    showToast('Documento eliminado');
   }
 }
+
 
 // ================= SUBIDA DE PLANILLA OFICIAL =================
 function handleUploadedPlanilla(files) {
