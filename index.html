@@ -1734,8 +1734,8 @@ details.hrs summary {
       </div>
     </div>
 
-    
-    <!-- SECCIÓN: SUBIDA Y GESTIÓN DE NOTAS (REGLA 1: LIMPIA MÓVIL VS PC) -->
+
+    <!-- SECCIÓN: SUBIDA Y GESTIÓN DE NOTAS (REGLA 1 & 6) -->
     <div class="card" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);">
       <div class="card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
         <div>
@@ -1743,19 +1743,26 @@ details.hrs summary {
             <span>📷</span> Carga de Notas y Récord Académico
           </h3>
           <small style="color:var(--text-muted);font-weight:700;">
-            Sube fotos de pantalla de PC, capturas o PDFs: el motor extraerá automáticamente tus notas exactas.
+            Sube fotos de pantalla de PC, capturas recortadas o documentos PDF: el motor ubicará automáticamente tus notas exactas en tu pensum.
           </small>
         </div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <!-- Hidden Input accesible para ambos dispositivos -->
+          <!-- Hidden Input para ambos dispositivos -->
           <input type="file" id="inputFileNotas" multiple accept="image/*,.pdf,application/pdf" style="display:none;" onchange="handleUploadedFiles(this.files)">
+          
+          <!-- Botón de Reinicio a Cero (Regla 6) -->
+          <button type="button" class="btn btn-secondary" id="btnResetAllGrades" onclick="resetAllGrades()" style="font-weight:800;color:#DC2626;border-color:#FECACA;background:#FEF2F2;" title="Limpiar todas las notas cargadas y reiniciar a cero">
+            🗑️ Borrar Notas Cargadas / Reiniciar
+          </button>
+
+          <!-- Botón Principal Subir Mis Notas (Regla 1) -->
           <button type="button" class="btn btn-primary" id="btnSubirNotas" onclick="triggerSubirNotas()" style="font-weight:900;padding:10px 22px;font-size:14px;box-shadow:0 3px 10px rgba(255,184,0,0.35);">
             📥 Subir Mis Notas
           </button>
         </div>
       </div>
 
-      <!-- MODAL / ÁREA DE ARRASTRE EXCLUSIVA PARA COMPUTADORA (REGLA 1: Solo en PC al pulsar el botón) -->
+      <!-- MODAL / ÁREA DE ARRASTRE EXCLUSIVA PARA COMPUTADORA (REGLA 1: Solo en PC) -->
       <div id="modalUploadPC" class="modal-overlay" style="display:none;z-index:9999;">
         <div class="modal-box" style="max-width:540px;border-top:4px solid var(--cat-yellow);padding:20px;">
           <div class="modal-header" style="margin-bottom:14px;">
@@ -1791,7 +1798,7 @@ details.hrs summary {
       <div id="scanStatusArea" style="display:none;margin-top:14px;background:#071530;border:1.5px solid var(--cat-yellow);border-radius:12px;padding:16px;color:#FFF;box-shadow:var(--shadow-md);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
           <b style="font-size:14px;color:var(--cat-yellow);display:flex;align-items:center;gap:8px;">
-            <span style="font-size:18px;">⚡</span> <span id="scanStatusTitle">Procesando imagen con Motor Local UNEXPO...</span>
+            <span style="font-size:18px;">⚡</span> <span id="scanStatusTitle">Procesando archivo con Motor Local UNEXPO...</span>
           </b>
           <span id="scanPercentBadge" style="font-size:12px;font-weight:900;background:rgba(255,184,0,0.25);color:var(--cat-yellow);padding:3px 10px;border-radius:6px;border:1px solid var(--cat-yellow);">0%</span>
         </div>
@@ -1800,128 +1807,15 @@ details.hrs summary {
         </div>
         <div id="scanStatusDetail" style="font-size:12px;color:#CBD5E1;font-family:'Space Grotesk',monospace;">Iniciando preprocesamiento canvas...</div>
       </div>
-
-      <!-- CUADRO DE REVISIÓN Y CONFIRMACIÓN TEMPORAL (REGLA 5: Se oculta y limpia al guardar) -->
-      <div id="scanReviewContainer" style="display:none;margin-top:16px;"></div>
-
     </div>
 
-    <!-- BASE DE DATOS EN COLUMNAS: HISTORIAL ACUMULADO DE CALIFICACIONES (REGLA 5) -->
-    <div class="card" id="gradesDatabaseCard" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);margin-top:16px;">
+    <!-- SECCIÓN UNIFICADA: MIS NOTAS Y PENSUM (REGLA 5: UN SOLO MENÚ DESPLEGABLE) -->
+    <div class="card" id="unifiedPensumCard" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);margin-top:16px;">
       <div class="card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
         <div>
-          <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
-            <span>📊</span> Base de Datos de Calificaciones (Récord Acumulado)
-          </h3>
-          <small id="gradesDbSubtitle" style="color:var(--text-muted);font-weight:700;">
-            Historial oficial en columnas. Puedes editar cualquier nota o sección directamente.
-          </small>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-          <input type="text" id="gradesDbSearchInput" class="form-control" placeholder="🔍 Filtrar materia o código..." style="width:200px;font-size:12.5px;padding:6px 10px;" oninput="renderGradesDatabaseTable()">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="openAddGradeModal()" style="font-weight:800;border-color:var(--cat-yellow);color:var(--unexpo-navy);">
-            + Agregar Materia
-          </button>
-          <button type="button" class="btn btn-primary btn-sm" onclick="triggerSubirNotas()" style="font-weight:800;">
-            📥 Subir Más Notas
-          </button>
-        </div>
-      </div>
-
-      <!-- Resumen estadístico de la Base de Datos -->
-      <div id="gradesDbStatsBanner" style="background:var(--paper-bg);padding:10px 14px;border-radius:8px;margin:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border:1px solid var(--card-border);font-size:13px;">
-        <!-- Inyectado dinámicamente -->
-      </div>
-
-      <!-- Contenedor de la Tabla en Columnas -->
-      <div style="overflow-x:auto;padding:0 16px 16px 16px;">
-        <table class="table-columns-db" style="width:100%;border-collapse:collapse;font-size:13px;border:1px solid var(--card-border);border-radius:8px;overflow:hidden;">
-          <thead>
-            <tr style="background:#071530;color:#FFF;text-align:left;">
-              <th style="padding:10px 12px;width:95px;">Código</th>
-              <th style="padding:10px 12px;">Asignatura</th>
-              <th style="padding:10px 12px;text-align:center;width:75px;">Semestre</th>
-              <th style="padding:10px 12px;text-align:center;width:60px;">U.C.</th>
-              <th style="padding:10px 12px;text-align:center;width:80px;">CSS (Sec)</th>
-              <th style="padding:10px 12px;text-align:center;width:95px;">Nota Exacta</th>
-              <th style="padding:10px 12px;text-align:center;width:110px;">Estado</th>
-              <th style="padding:10px 12px;text-align:right;width:70px;">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="gradesDatabaseTbody">
-            <!-- Inyectado dinámicamente -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- SECCIÓN / CARPETA: MIS DOCUMENTOS RESPALDADOS EN INDEXEDDB (REGLA 6) -->
-    <div class="card" id="userDocumentsCard" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);margin-top:16px;">
-      <div class="card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
-        <div>
-          <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
-            <span>📂</span> Mis Documentos (Fotos y Capturas en Alta Definición)
-          </h3>
-          <small style="color:var(--text-muted);font-weight:700;">
-            Almacenamiento local seguro en IndexedDB para no saturar memoria. Pulsa cualquier documento para abrirlo en el visor interactivo.
-          </small>
-        </div>
-        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerSubirNotas()" style="font-weight:800;border-color:var(--cat-yellow);">
-          + Subir Otro Documento
-        </button>
-      </div>
-
-      <!-- Galería de Documentos Subidos -->
-      <div id="docGallery" class="doc-gallery-grid" style="padding:16px;"></div>
-    </div>
-
-    <!-- MODAL PARA AGREGAR MATERIA MANUAL A LA BASE DE DATOS -->
-    <div id="modalAddManualSubject" class="modal-overlay" style="display:none;z-index:9999;">
-      <div class="modal-box" style="max-width:480px;border-top:4px solid var(--cat-yellow);padding:20px;">
-        <div class="modal-header" style="margin-bottom:12px;">
-          <h3 class="modal-title" style="font-size:16px;font-weight:900;color:var(--unexpo-navy);">+ Agregar Materia a Base de Datos</h3>
-          <button type="button" class="modal-close" onclick="closeModal('modalAddManualSubject')">&times;</button>
-        </div>
-        <div class="modal-body" style="padding:0;display:flex;flex-direction:column;gap:10px;">
-          <div>
-            <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Código UNEXPO:</label>
-            <input type="text" id="manualSubjCode" class="form-control" placeholder="Ej: EB1115" maxlength="8" oninput="this.value=this.value.toUpperCase(); autoFillManualSubject(this.value)">
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Nombre de Asignatura:</label>
-            <input type="text" id="manualSubjName" class="form-control" placeholder="Ej: CÁLCULO I">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-            <div>
-              <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Semestre:</label>
-              <input type="text" id="manualSubjSem" class="form-control" placeholder="I" style="text-align:center;">
-            </div>
-            <div>
-              <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">U.C.:</label>
-              <input type="number" id="manualSubjUc" class="form-control" placeholder="5" min="1" max="10" style="text-align:center;">
-            </div>
-            <div>
-              <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">CSS (Sec):</label>
-              <input type="text" id="manualSubjCss" class="form-control" placeholder="01" style="text-align:center;">
-            </div>
-          </div>
-          <div>
-            <label style="font-size:12px;font-weight:800;display:block;margin-bottom:4px;">Nota Exacta (1-9 pts o N.P.):</label>
-            <input type="text" id="manualSubjScore" class="form-control" placeholder="Ej: 7,4" style="text-align:center;font-weight:900;font-size:15px;color:var(--unexpo-navy);">
-          </div>
-        </div>
-        <div class="modal-footer" style="padding:0;margin-top:14px;display:flex;justify-content:flex-end;gap:8px;">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('modalAddManualSubject')">Cancelar</button>
-          <button type="button" class="btn btn-primary" onclick="saveManualSubject()" style="font-weight:900;">Guardar Materia</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Selector de Carrera & Dashboard de Rendimiento -->
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2 class="card-title">🎓 Materias del Pensum & Progreso</h2>
+          <h2 class="card-title" style="display:flex;align-items:center;gap:8px;">
+            <span>🎓</span> Mis Notas y Pensum
+          </h2>
           <small id="carreraSubtitle" style="color:var(--text-muted);font-weight:700;">Ingeniería Industrial (Pensum Oficial)</small>
         </div>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -1949,7 +1843,7 @@ details.hrs summary {
         </div>
       </div>
 
-      <!-- Dashboard Visual: Medidor Radial + Estadísticas -->
+      <!-- Dashboard Visual de Rendimiento Unificado -->
       <div class="dashboard-grid">
         <div class="gauge-card">
           <div class="radial-gauge">
@@ -1996,14 +1890,36 @@ details.hrs summary {
           </div>
         </div>
       </div>
+
+      <!-- PESTAÑAS / ACORDEONES DESPLEGABLES POR SEMESTRES (1° AL 10° + ELECTIVAS) -->
+      <div style="padding:16px;">
+        <div id="semestersContainer"></div>
+      </div>
     </div>
 
-    <!-- Lista de Semestres y Materias -->
-    <div id="semestersContainer"></div>
+    <!-- SECCIÓN / CARPETA: MIS DOCUMENTOS RESPALDADOS EN INDEXEDDB (REGLA 7) -->
+    <div class="card" id="userDocumentsCard" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-sm);margin-top:16px;">
+      <div class="card-header" style="flex-wrap:wrap;gap:12px;align-items:center;">
+        <div>
+          <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
+            <span>📂</span> Mis Documentos (Fotos y Capturas en Alta Definición)
+          </h3>
+          <small style="color:var(--text-muted);font-weight:700;">
+            Almacenamiento local seguro en IndexedDB para no saturar memoria. Pulsa cualquier documento para abrirlo en el visor interactivo.
+          </small>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerSubirNotas()" style="font-weight:800;border-color:var(--cat-yellow);">
+          + Subir Otro Documento
+        </button>
+      </div>
+
+      <!-- Galería de Documentos Subidos -->
+      <div id="docGallery" class="doc-gallery-grid" style="padding:16px;"></div>
+    </div>
+
   </section>
 
-  <!-- ================= TAB 2: ARMAR MI HORARIO 2026-2 (CONSTRUCTOR INTERACTIVO) ================= -->
-  <section id="tab-horarios" class="tab-panel">
+  <!-- ================= TAB 2: ARMAR MI HORARIO 2026-2 ================= --><section id="tab-horarios" class="tab-panel">
     <!-- Banner de Turno Personalizado -->
     <div class="hero-banner" style="background:linear-gradient(135deg,#071530 0%,#0C214A 100%);">
       <div class="hero-content">
@@ -2446,7 +2362,7 @@ details.hrs summary {
   </div>
 </div>
 
-<!-- MODAL: VISOR DE DOCUMENTO INTERACTIVO CON ZOOM, PANNING Y ROTACIÓN (REGLA 6) -->
+<!-- MODAL: VISOR DE DOCUMENTO INTERACTIVO CON ZOOM, PANNING Y ROTACIÓN (REGLA 7) -->
 <div class="modal-overlay" id="modalDocViewer" style="z-index:99999;">
   <div class="modal-box" style="max-width:980px;width:96vw;padding:16px;max-height:92vh;display:flex;flex-direction:column;">
     <div class="modal-header" style="flex-wrap:wrap;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1.5px solid var(--card-border);">
@@ -3791,6 +3707,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSummary();
 
   renderDocumentGallery();
+  initUserDocuments();
   renderPensumsCatalog();
   populateEvalSelect();
 
@@ -3836,7 +3753,7 @@ function updateMotivationalQuote() {
 }
 
 // ===========================================================================
-// POLIAPP UNEXPO: MOTOR UNIVERSAL DE ESCANEO, INDEXEDDB Y BASE DE DATOS
+// POLIAPP UNEXPO: MOTOR UNIVERSAL DE ESCANEO, VALIDACIÓN Y PENSUM UNIFICADO
 // ===========================================================================
 
 var detectedScanSubjects = [];
@@ -3849,7 +3766,7 @@ var detectedScanMetadata = {
 };
 
 // ===========================================================================
-// 1. REGLA 1: DETECCIÓN TELÉFONO VS COMPUTADORA & INTERFAZ LIMPIA
+// 1. REGLA 1: INTERFAZ DE SUBIDA LIMPIA (MÓVIL VS. COMPUTADORA)
 // ===========================================================================
 function isMobileDevice() {
   if (typeof window === 'undefined') return false;
@@ -3886,7 +3803,7 @@ function closeModalUploadPC() {
 }
 
 // ===========================================================================
-// 2. REGLA 6: ALMACENAMIENTO DE DOCUMENTOS EN INDEXEDDB
+// 2. REGLA 7: ALMACENAMIENTO DE DOCUMENTOS EN INDEXEDDB
 // ===========================================================================
 var DOCS_DB_NAME = 'PoliApp_Docs_v1';
 var DOCS_STORE_NAME = 'documents';
@@ -3987,9 +3904,6 @@ function preprocessImageForOCR(sourceImg) {
   var origW = sourceImg.naturalWidth || sourceImg.videoWidth || sourceImg.width;
   var origH = sourceImg.naturalHeight || sourceImg.videoHeight || sourceImg.height;
 
-  // 1. Escalado inteligente:
-  // Si es pequeña (< 1200px), escalar x2 para definición.
-  // Si es gigante de cámara (> 2400px), ajustar a 2200px óptimo manteniendo proporción.
   var targetW = origW;
   var targetH = origH;
   if (origW < 1200) {
@@ -4013,14 +3927,12 @@ function preprocessImageForOCR(sourceImg) {
   var data = imgData.data;
   var totalPixels = targetW * targetH;
 
-  // Grayscale ITU-R BT.601
   var gray = new Float32Array(totalPixels);
   for (var i = 0, g = 0; i < data.length; i += 4, g++) {
     gray[g] = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
   }
 
-  // 2. Filtro Anti-Moiré (Para fotos tomadas a pantallas/monitores de computadora):
-  // Micro-suavizado promedio 3x3 para eliminar la cuadrícula/rayas de píxeles del monitor
+  // Filtro Anti-Moiré (micro-suavizado 3x3) para eliminar rejilla de píxeles de monitor de PC
   var smoothed = new Float32Array(totalPixels);
   for (var y = 0; y < targetH; y++) {
     var yPrev = y > 0 ? (y - 1) * targetW : y * targetW;
@@ -4039,7 +3951,7 @@ function preprocessImageForOCR(sourceImg) {
     }
   }
 
-  // Comprobar polaridad (modo oscuro vs modo claro):
+  // Detección de polaridad (modo oscuro):
   var sampleSum = 0;
   var step = Math.max(1, (totalPixels / 2000) | 0);
   var samples = 0;
@@ -4049,14 +3961,12 @@ function preprocessImageForOCR(sourceImg) {
   }
   var avgLuma = samples > 0 ? sampleSum / samples : 128;
   if (avgLuma < 115) {
-    // Si el fondo promedio es oscuro, invertir para trabajar en texto oscuro sobre fondo blanco
     for (var g = 0; g < totalPixels; g++) {
       smoothed[g] = 255 - smoothed[g];
     }
   }
 
-  // 3. Normalización Local de Fondo e Iluminación (División de Fondo / Multi-Color):
-  // Calculamos el fondo local usando imagen integral para ventana adaptativa (R ~ 20-30 px)
+  // Normalización Local de Fondo e Iluminación (División de Fondo)
   var stride = targetW + 1;
   var intImg = new Float64Array((targetW + 1) * (targetH + 1));
   for (var y = 0; y < targetH; y++) {
@@ -4084,11 +3994,9 @@ function preprocessImageForOCR(sourceImg) {
       var localBg = sum / area;
       if (localBg < 15) localBg = 15;
 
-      // Normalización local: (pixel / localBg) * 255
       var pVal = smoothed[rowOff + x];
       var normalized = (pVal / localBg) * 255;
 
-      // Salida nítida: fondo blanco (#FFF) y texto negro (#000)
       var finalVal;
       if (normalized >= 225) {
         finalVal = 255;
@@ -4111,7 +4019,7 @@ function preprocessImageForOCR(sourceImg) {
 }
 
 // ===========================================================================
-// 4. REGLA 3 & 4: NORMALIZACIÓN, LEVENSHTEIN Y PARSER DE NOTAS EXACTAS
+// 4. REGLA 3 & 4: NORMALIZACIÓN, LEVENSHTEIN, COLUMNAS Y NOTAS EXACTAS
 // ===========================================================================
 function normalizeOcrText(str) {
   if (!str) return '';
@@ -4169,13 +4077,17 @@ function correctOcrSubjectCode(raw) {
   var prefix = cleaned.slice(0, 2);
   var suffix = cleaned.slice(2);
 
+  // Corregir errores comunes de OCR en códigos UNEXPO (ej: I13043 -> II3043, EBII15 -> EB1115)
+  if (prefix === 'I1') prefix = 'II';
+  else if (prefix === '1I') prefix = 'II';
+  else if (prefix === '11') prefix = 'II';
+
   prefix = prefix.replace(/0/g, 'O').replace(/1/g, 'I').replace(/5/g, 'S').replace(/8/g, 'B').replace(/2/g, 'Z');
   suffix = suffix.replace(/O/g, '0').replace(/I/g, '1').replace(/L/g, '1').replace(/S/g, '5').replace(/B/g, '8').replace(/Z/g, '2');
 
   return prefix + suffix;
 }
 
-// Catálogo Global Completo de Materias
 function getAllSubjectsCatalog() {
   var catalog = {};
 
@@ -4215,7 +4127,8 @@ function getAllSubjectsCatalog() {
   return catalog;
 }
 
-// Parser de Columnas: Distingue [UC] [NOTA] vs [UC] [CSS] [NOTA] con CERO notas inventadas
+// Extracción exacta de columnas [C.M.] [CÓDIGO] [ASIGNATURA] [UC] [CSS] [NOTA] [OBS]
+// CERO redondeos, CERO notas inventadas, reconstrucción de comas omitidas
 function parseLineColumnsAndGrade(line, matchedSubj) {
   var expectedUc = matchedSubj ? matchedSubj.u : null;
   var tokens = line.trim().split(/\s+/);
@@ -4239,7 +4152,6 @@ function parseLineColumnsAndGrade(line, matchedSubj) {
   if (isNp) {
     status = 'rep';
     exactGrade = 'N.P.';
-    // Aún en NP, extraer UC y CSS si están presentes
     if (numTokens.length >= 2) {
       ucFound = parseInt(numTokens[0], 10) || ucFound;
       cssFound = numTokens[1];
@@ -4266,7 +4178,7 @@ function parseLineColumnsAndGrade(line, matchedSubj) {
         exactGrade = String(intVal) + ',0';
         status = intVal >= 5 ? 'ok' : 'rep';
       } else if (intVal >= 10 && intVal <= 99) {
-        // Reconstrucción exacta de coma omitida por cámara (ej: 63 -> 6,3; 74 -> 7,4; 50 -> 5,0; 85 -> 8,5; 42 -> 4,2)
+        // Reconstrucción de coma omitida por cámara (ej: 59 -> 5,9; 90 -> 9,0; 63 -> 6,3; 74 -> 7,4; 50 -> 5,0; 42 -> 4,2; 85 -> 8,5)
         var dec = (intVal / 10).toFixed(1);
         exactGrade = dec.replace('.', ',');
         status = parseFloat(dec) >= 5.0 ? 'ok' : 'rep';
@@ -4276,7 +4188,6 @@ function parseLineColumnsAndGrade(line, matchedSubj) {
       }
     }
 
-    // Análisis de tokens anteriores para [UC] y [CSS]
     if (remainingNums.length >= 2) {
       ucFound = parseInt(remainingNums[0], 10) || ucFound;
       cssFound = remainingNums[1];
@@ -4292,7 +4203,6 @@ function parseLineColumnsAndGrade(line, matchedSubj) {
     }
   }
 
-  // Palabras clave de aprobación o reprobación
   var lineUpper = line.toUpperCase();
   if (lineUpper.includes('APROB') || lineUpper.includes('EQ') || lineUpper.includes('EXO')) {
     status = 'ok';
@@ -4309,7 +4219,7 @@ function parseLineColumnsAndGrade(line, matchedSubj) {
   };
 }
 
-// Analizador Universal sin encabezado obligatorio (Reconoce por Código O por Nombre)
+// Analizador de Texto con detección de identidad (Regla 3)
 function parseDocumentTextAndMatchSubjects(rawText) {
   var lines = rawText.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(Boolean);
   var detected = [];
@@ -4325,7 +4235,7 @@ function parseDocumentTextAndMatchSubjects(rawText) {
 
   var fullTextUpper = rawText.toUpperCase();
 
-  // Detección opcional de Cédula si existe en encabezado
+  // Detección de Cédula
   var cedulaMatch = fullTextUpper.match(/(?:C\.?I\.?|V-?|CEDULA|IDENTIDAD)[:\s]*([0-9]{1,2}[\.,]?[0-9]{3}[\.,]?[0-9]{3}|[0-9]{7,8})/);
   if (!cedulaMatch) cedulaMatch = fullTextUpper.match(/\b([0-9]{7,8})\b/);
   if (cedulaMatch) {
@@ -4339,7 +4249,13 @@ function parseDocumentTextAndMatchSubjects(rawText) {
     }
   }
 
-  // Detección opcional de Carrera
+  // Detección de Nombre en documento
+  var nameMatch = fullTextUpper.match(/(?:ALUMNO|ESTUDIANTE|NOMBRE|BR\.?)[:\s]+([A-ZÁÉÍÓÚÑ\s]{6,40})/);
+  if (nameMatch && !metadata.nombre) {
+    metadata.nombre = nameMatch[1].trim();
+  }
+
+  // Detección de Carrera
   var carHeaderMatch = fullTextUpper.match(/(?:ESPECIALIDAD|CARRERA|INGENIER[IÍ]A)[:\s]+([^\n\r,]+)/i);
   var carSearchText = carHeaderMatch ? carHeaderMatch[0] : fullTextUpper;
 
@@ -4364,7 +4280,7 @@ function parseDocumentTextAndMatchSubjects(rawText) {
     var matchedSubj = null;
     var matchScore = 0;
 
-    // VÍA 1: Búsqueda por Código UNEXPO (2 letras + 4 dígitos)
+    // VÍA 1: Por Código UNEXPO (2 letras + 4 dígitos)
     var codeTokens = line.match(/\b[A-Za-z0-9]{2}\s*[-_]?\s*[A-Za-z0-9]{4}\b/g) || [];
     for (var ct = 0; ct < codeTokens.length; ct++) {
       var candidateCode = correctOcrSubjectCode(codeTokens[ct]);
@@ -4375,7 +4291,7 @@ function parseDocumentTextAndMatchSubjects(rawText) {
       }
     }
 
-    // VÍA 2: Búsqueda Difusa por Nombre de Asignatura (Levenshtein >= 75%)
+    // VÍA 2: Por Nombre de Asignatura (Levenshtein >= 75%)
     if (!matchedSubj) {
       var bestSim = 0;
       var bestCandidate = null;
@@ -4402,13 +4318,10 @@ function parseDocumentTextAndMatchSubjects(rawText) {
       }
     }
 
-    // Si se identificó la asignatura, extraer columnas [UC], [CSS] y [NOTA EXACTA]
     if (matchedSubj && !seenCodes[matchedSubj.c]) {
       seenCodes[matchedSubj.c] = true;
 
       var colData = parseLineColumnsAndGrade(line, matchedSubj);
-
-      // Si no se detectó nota numérica ni keyword, NO inventar 7 ni notas
       var finalScore = colData.grade ? colData.grade : '5,0';
       var numericScore = parseFloat(String(finalScore).replace(',', '.')) || (colData.status === 'ok' ? 5.0 : 0);
 
@@ -4434,7 +4347,104 @@ function parseDocumentTextAndMatchSubjects(rawText) {
 }
 
 // ===========================================================================
-// 5. PIPELINE PRINCIPAL DE ESCANEO LOCAL (IMÁGENES Y PDF)
+// 5. REGLA 3: VALIDACIÓN INTELIGENTE DE IDENTIDAD
+// ===========================================================================
+function validateDocumentIdentity(docMetadataOrText) {
+  var docMetadata = typeof docMetadataOrText === 'string'
+    ? parseDocumentTextAndMatchSubjects(docMetadataOrText).metadata
+    : (docMetadataOrText || {});
+
+  // Se evalúa SOLO cuando la imagen o documento SÍ contenga un Nombre acompañado de Cédula o Expediente
+  var hasIdentityInDoc = !!((docMetadata.nombre && (docMetadata.cedula || docMetadata.expediente)) || 
+                         (docMetadata.cedula && docMetadata.expediente));
+
+  if (!hasIdentityInDoc) {
+    // Si NO tiene Nombre / Cédula / Expediente (captura parcial): NO PASA NADA, PERMÍTELO DIRECTAMENTE
+    return { ok: true, allowed: true, hasDocIdentity: false, reason: 'partial_capture' };
+  }
+
+  // El documento SÍ contiene identidad formal
+  var profileHasIdentity = !!(userProfile.cedula || userProfile.expediente);
+
+  if (!profileHasIdentity) {
+    // Si el usuario aún no tenía datos en su perfil, registrar como titular
+    if (docMetadata.cedula) {
+      userProfile.cedula = docMetadata.cedula;
+      currentUserCedula = docMetadata.cedula;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('poli_active_cedula', docMetadata.cedula);
+    }
+    if (docMetadata.nombre) userProfile.nombre = docMetadata.nombre;
+    if (docMetadata.expediente) userProfile.expediente = docMetadata.expediente;
+    if (docMetadata.carrera) {
+      userProfile.carrera = docMetadata.carrera;
+      state.car = docMetadata.carrera;
+      if (typeof localStorage !== 'undefined') localStorage.setItem('poli_global_carrera', docMetadata.carrera);
+    }
+    if (typeof updateHeaderUserChip === 'function') updateHeaderUserChip();
+    if (userProfile.cedula && typeof syncTurnoUI === 'function') syncTurnoUI(userProfile.cedula);
+    return { ok: true, allowed: true, hasDocIdentity: true, reason: 'auto_registered' };
+  }
+
+  // Si ya tiene titular registrado, comparar si coinciden:
+  var docCed = docMetadata.cedula ? docMetadata.cedula.replace(/\D/g, '') : '';
+  var userCed = userProfile.cedula ? userProfile.cedula.replace(/\D/g, '') : '';
+  var docExp = docMetadata.expediente ? docMetadata.expediente.replace(/[^A-Za-z0-9]/g, '').toUpperCase() : '';
+  var userExp = userProfile.expediente ? userProfile.expediente.replace(/[^A-Za-z0-9]/g, '').toUpperCase() : '';
+
+  var isCedulaMismatch = docCed && userCed && docCed !== userCed;
+  var isExpMismatch = docExp && userExp && docExp !== userExp;
+
+  if (isCedulaMismatch || isExpMismatch) {
+    var errMsg = '🚫 Estas notas no corresponden a ti. Carga las tuyas, por favor.';
+    if (typeof alert === 'function') alert(errMsg);
+    // BLOQUEA LA CARGA
+    return {
+      ok: false,
+      allowed: false,
+      hasDocIdentity: true,
+      reason: 'mismatch',
+      message: errMsg
+    };
+  }
+
+  return { ok: true, allowed: true, hasDocIdentity: true, reason: 'matched' };
+}
+
+function applyScannedGradesToPensum(subjects) {
+  var list = subjects || detectedScanSubjects || [];
+  list.forEach(function(s) {
+    if (!studentGrades[s.code]) {
+      studentGrades[s.code] = {
+        code: s.code,
+        name: s.name,
+        sem: s.sem || '—',
+        uc: s.uc,
+        css: s.css || '',
+        score: s.score,
+        status: s.status,
+        updatedAt: new Date().toLocaleDateString('es-VE')
+      };
+    } else {
+      if (s.score != null) studentGrades[s.code].score = s.score;
+      if (s.status) studentGrades[s.code].status = s.status;
+      if (s.css) studentGrades[s.code].css = s.css;
+    }
+  });
+  if (typeof saveActiveUserData === 'function') saveActiveUserData();
+  if (typeof renderSemesters === 'function') renderSemesters(userProfile.carrera, userProfile.mencion);
+  if (typeof updateProgressStats === 'function') updateProgressStats();
+  if (typeof renderTabs === 'function') renderTabs();
+  if (typeof renderList === 'function') renderList();
+  if (typeof renderSummary === 'function') renderSummary();
+}
+
+var updateSubjectInlineGrade = updateSubjectGrade;
+var updateSubjectInlineCss = updateSubjectCss;
+var processFileItem = runLocalOcrPipeline;
+
+
+// ===========================================================================
+// 6. PIPELINE PRINCIPAL DE ESCANEO & CARGA PROGRESIVA SIN DUPLICAR (REGLA 6)
 // ===========================================================================
 async function runLocalOcrPipeline(file, onProgress) {
   onProgress(10, 'Leyendo archivo binario en memoria...');
@@ -4508,9 +4518,6 @@ async function runLocalOcrPipeline(file, onProgress) {
   return parsedResult;
 }
 
-// ===========================================================================
-// 6. MANEJADOR DE ARCHIVOS SUBIDOS & CARGA ACUMULATIVA (FUSIÓN INTELIGENTE)
-// ===========================================================================
 async function handleUploadedFiles(files) {
   if (!files || !files.length) return;
   var fileList = Array.from(files);
@@ -4519,10 +4526,8 @@ async function handleUploadedFiles(files) {
   var pFill = document.getElementById('scanProgressBarFill');
   var pBadge = document.getElementById('scanPercentBadge');
   var sDetail = document.getElementById('scanStatusDetail');
-  var reviewWrap = document.getElementById('scanReviewContainer');
 
   if (statusArea) statusArea.style.display = 'block';
-  if (reviewWrap) reviewWrap.style.display = 'none';
 
   function updateProgress(pct, msg) {
     if (pFill) pFill.style.width = pct + '%';
@@ -4530,7 +4535,8 @@ async function handleUploadedFiles(files) {
     if (sDetail) sDetail.textContent = msg;
   }
 
-  detectedScanSubjects = [];
+  var loadedCount = 0;
+  var blockedFiles = [];
 
   for (var f = 0; f < fileList.length; f++) {
     var file = fileList[f];
@@ -4541,6 +4547,16 @@ async function handleUploadedFiles(files) {
       r.readAsDataURL(file);
     });
 
+    var res = await runLocalOcrPipeline(file, updateProgress);
+
+    // REGLA 3: Validación Inteligente de Identidad
+    var idCheck = validateDocumentIdentity(res.metadata);
+    if (!idCheck.ok) {
+      blockedFiles.push({ file: file.name, msg: idCheck.message });
+      continue; // Bloquear la carga de este archivo
+    }
+
+    // Guardar documento válido en IndexedDB (Regla 7)
     var docObj = {
       id: 'doc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
       name: file.name,
@@ -4549,499 +4565,382 @@ async function handleUploadedFiles(files) {
       date: new Date().toLocaleDateString('es-VE'),
       dataUrl: dataUrl
     };
-
-    // Guardar en almacenamiento seguro IndexedDB (Regla 6)
     userDocuments.push(docObj);
     await saveDocToStorage(docObj);
 
-    var res = await runLocalOcrPipeline(file, updateProgress);
-
-    // Actualizar metadatos si vienen en el encabezado
-    if (res.metadata.cedula) detectedScanMetadata.cedula = res.metadata.cedula;
-    if (res.metadata.nombre) detectedScanMetadata.nombre = res.metadata.nombre;
-    if (res.metadata.expediente) detectedScanMetadata.expediente = res.metadata.expediente;
-    if (res.metadata.carrera) detectedScanMetadata.carrera = res.metadata.carrera;
-
-    // FUSIÓN ACUMULATIVA: Combinar materias detectadas sin duplicados en el lote actual
+    // REGLA 5 & 6: Carga Progresiva en el Pensum Unificado sin duplicar
     res.subjects.forEach(function(s) {
-      var existing = detectedScanSubjects.find(function(d) { return d.code === s.code; });
+      var existing = studentGrades[s.code];
       if (!existing) {
-        detectedScanSubjects.push(s);
+        studentGrades[s.code] = {
+          code: s.code,
+          name: s.name,
+          sem: s.sem || '—',
+          uc: s.uc,
+          css: s.css || '',
+          score: s.score,
+          status: s.status,
+          updatedAt: new Date().toLocaleDateString('es-VE')
+        };
+        loadedCount++;
       } else {
-        existing.score = s.score;
-        existing.status = s.status;
+        // Si ya existía, actualizar si cambió o se completó
+        if (s.score != null) existing.score = s.score;
+        if (s.status) existing.status = s.status;
         if (s.css) existing.css = s.css;
+        existing.updatedAt = new Date().toLocaleDateString('es-VE');
+        loadedCount++;
       }
     });
   }
 
+  if (statusArea) statusArea.style.display = 'none';
+
   saveActiveUserData();
   renderDocumentGallery();
-
-  setTimeout(function() {
-    if (statusArea) statusArea.style.display = 'none';
-    renderScanReviewTable();
-  }, 600);
-}
-
-// ===========================================================================
-// 7. CUADRO DE REVISIÓN Y CONFIRMACIÓN TEMPORAL (REGLA 5)
-// ===========================================================================
-function renderScanReviewTable() {
-  var reviewWrap = document.getElementById('scanReviewContainer');
-  if (!reviewWrap) return;
-
-  if (!detectedScanSubjects.length) {
-    reviewWrap.innerHTML = `
-      <div class="card" style="border:1.5px solid var(--cat-yellow);margin-top:14px;background:#FFFBEB;">
-        <div style="display:flex;align-items:center;gap:12px;padding:8px;">
-          <span style="font-size:24px;">ℹ️</span>
-          <div>
-            <b style="color:#92400E;font-size:14px;">No se identificaron asignaturas legibles en las fotos o documentos subidos.</b>
-            <div style="font-size:12px;color:#78350F;margin-top:2px;">Asegúrate de que la captura o foto contenga nombres o códigos de materias del pensum.</div>
-          </div>
-        </div>
-      </div>
-    `;
-    reviewWrap.style.display = 'block';
-    return;
-  }
-
-  var appCount = detectedScanSubjects.filter(function(s) { return s.status === 'ok'; }).length;
-  var repCount = detectedScanSubjects.length - appCount;
-
-  var metaHtml = '';
-  if (detectedScanMetadata.cedula || detectedScanMetadata.nombre) {
-    metaHtml = `
-      <div style="background:var(--paper-bg);padding:10px 14px;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12.5px;border:1px solid var(--card-border);">
-        <div>
-          <b>👤 Estudiante:</b> ${esc(detectedScanMetadata.nombre || 'Detectado')} ·
-          <b>Cédula:</b> V-${esc(detectedScanMetadata.cedula || '--')} ·
-          <b>Expediente:</b> ${esc(detectedScanMetadata.expediente || '--')}
-        </div>
-        <span class="badge badge-ok">✓ Verificado</span>
-      </div>
-    `;
-  }
-
-  var rowsHtml = detectedScanSubjects.map(function(s, idx) {
-    var isOk = s.status === 'ok';
-    return `
-      <tr style="border-bottom:1px solid var(--card-border);background:${isOk ? '#FFF' : '#FEF2F2'};">
-        <td style="padding:10px 12px;font-weight:800;color:var(--unexpo-navy);">${esc(s.code)}</td>
-        <td style="padding:10px 12px;">${esc(s.name)}</td>
-        <td style="padding:10px 12px;text-align:center;font-weight:700;">${esc(s.sem)}</td>
-        <td style="padding:10px 12px;text-align:center;font-weight:800;">${s.uc}</td>
-        <td style="padding:10px 12px;text-align:center;">
-          <input type="text" value="${esc(s.css || '')}" class="form-control" style="width:60px;display:inline-block;padding:4px;text-align:center;font-size:12.5px;" onchange="updateScanRowCss(${idx}, this.value)" placeholder="Sec">
-        </td>
-        <td style="padding:10px 12px;text-align:center;">
-          <input type="text" value="${esc(String(s.score))}" class="form-control" style="width:75px;display:inline-block;padding:4px;text-align:center;font-weight:900;color:var(--unexpo-navy);" onchange="updateScanRowGrade(${idx}, this.value)">
-        </td>
-        <td style="padding:10px 12px;text-align:center;">
-          <button type="button" class="btn btn-sm ${isOk ? 'btn-primary' : 'btn-danger'}" style="padding:3px 10px;font-size:11.5px;font-weight:800;" onclick="toggleScanRowStatus(${idx})">
-            ${isOk ? '✅ Aprobada' : '❌ Reprobada'}
-          </button>
-        </td>
-        <td style="padding:10px 12px;text-align:right;">
-          <button type="button" class="btn btn-secondary btn-sm" style="color:#DC2626;padding:2px 8px;font-size:12px;" onclick="deleteScanRow(${idx})" title="Quitar de la lista">✕</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  reviewWrap.innerHTML = `
-    <div class="card" style="border-top:3.5px solid var(--cat-yellow);box-shadow:var(--shadow-md);">
-      <div class="card-header" style="flex-wrap:wrap;gap:10px;">
-        <div>
-          <h3 class="card-title" style="display:flex;align-items:center;gap:8px;">
-            <span>📋</span> Revisión de Notas Detectadas (${detectedScanSubjects.length} encontradas)
-          </h3>
-          <small style="color:var(--text-muted);font-weight:700;">
-            ${appCount} aprobadas y ${repCount} reprobadas. Puedes ajustar cualquier nota exacta antes de guardar.
-          </small>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button type="button" class="btn btn-primary" onclick="applyScannedGradesToPensum()" style="font-weight:900;padding:8px 18px;font-size:13.5px;">
-            ✅ Guardar en Mi Récord
-          </button>
-          <button type="button" class="btn btn-secondary btn-sm" onclick="dismissScanReview()">✕ Descartar</button>
-        </div>
-      </div>
-
-      ${metaHtml}
-
-      <div style="overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-          <thead>
-            <tr style="background:var(--paper-bg);border-bottom:1.5px solid var(--card-border);">
-              <th style="padding:10px 12px;text-align:left;">Código</th>
-              <th style="padding:10px 12px;text-align:left;">Asignatura</th>
-              <th style="padding:10px 12px;text-align:center;">Semestre</th>
-              <th style="padding:10px 12px;text-align:center;">U.C.</th>
-              <th style="padding:10px 12px;text-align:center;">CSS (Sec)</th>
-              <th style="padding:10px 12px;text-align:center;">Nota Exacta</th>
-              <th style="padding:10px 12px;text-align:center;">Estado</th>
-              <th style="padding:10px 12px;text-align:right;">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div style="font-size:12.5px;color:var(--text-muted);font-weight:700;">
-          💡 Al pulsar "Guardar en Mi Récord", esta lista se limpiará y tus notas se sincronizarán con la Base de Datos.
-        </div>
-        <button type="button" class="btn btn-primary" onclick="applyScannedGradesToPensum()" style="font-weight:900;padding:8px 20px;">
-          ✅ Guardar en Mi Récord
-        </button>
-      </div>
-    </div>
-  `;
-
-  reviewWrap.style.display = 'block';
-  reviewWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function dismissScanReview() {
-  detectedScanSubjects = [];
-  var reviewWrap = document.getElementById('scanReviewContainer');
-  if (reviewWrap) {
-    reviewWrap.innerHTML = '';
-    reviewWrap.style.display = 'none';
-  }
-}
-
-function updateScanRowGrade(idx, val) {
-  if (detectedScanSubjects[idx]) {
-    detectedScanSubjects[idx].score = val;
-    detectedScanSubjects[idx]._origScore = val;
-    var num = parseFloat(String(val).replace(',', '.'));
-    if (!isNaN(num)) {
-      detectedScanSubjects[idx].status = num >= 5.0 ? 'ok' : 'rep';
-    }
-    renderScanReviewTable();
-  }
-}
-
-function updateScanRowCss(idx, val) {
-  if (detectedScanSubjects[idx]) {
-    detectedScanSubjects[idx].css = val;
-  }
-}
-
-function toggleScanRowStatus(idx) {
-  var s = detectedScanSubjects[idx];
-  if (!s) return;
-  s.status = s.status === 'ok' ? 'rep' : 'ok';
-  if (s.status === 'ok') {
-    var num = parseFloat(String(s.score).replace(',', '.'));
-    if (isNaN(num) || num < 5.0) s.score = '5,0';
-  } else {
-    var num = parseFloat(String(s.score).replace(',', '.'));
-    if (isNaN(num) || num >= 5.0) s.score = '4,0';
-  }
-  renderScanReviewTable();
-}
-
-function deleteScanRow(idx) {
-  detectedScanSubjects.splice(idx, 1);
-  renderScanReviewTable();
-}
-
-// ===========================================================================
-// 8. CARGA ACUMULATIVA EN STUDENTGRADES & LIMPIEZA DE PANTALLA (REGLA 5)
-// ===========================================================================
-function applyScannedGradesToPensum() {
-  if (!detectedScanSubjects.length) return;
-
-  // Carga acumulativa: Fusión sin borrar materias previas
-  detectedScanSubjects.forEach(function(s) {
-    var numericScore = parseFloat(String(s.score).replace(',', '.'));
-    if (isNaN(numericScore)) numericScore = s.status === 'ok' ? 5.0 : 0;
-
-    studentGrades[s.code] = {
-      code: s.code,
-      name: s.name,
-      sem: s.sem || '—',
-      uc: s.uc,
-      css: s.css || (studentGrades[s.code] ? studentGrades[s.code].css : ''),
-      score: s.score,
-      numericScore: numericScore,
-      _origScore: s.score,
-      status: s.status,
-      updatedAt: new Date().toLocaleDateString('es-VE')
-    };
-  });
-
-  if (detectedScanMetadata.cedula) {
-    userProfile.cedula = detectedScanMetadata.cedula;
-    currentUserCedula = detectedScanMetadata.cedula;
-    localStorage.setItem('poli_active_cedula', detectedScanMetadata.cedula);
-  }
-  if (detectedScanMetadata.nombre && !userProfile.nombre) {
-    userProfile.nombre = detectedScanMetadata.nombre;
-  }
-  if (detectedScanMetadata.expediente && !userProfile.expediente) {
-    userProfile.expediente = detectedScanMetadata.expediente;
-  }
-  if (detectedScanMetadata.carrera) {
-    userProfile.carrera = detectedScanMetadata.carrera;
-    state.car = detectedScanMetadata.carrera;
-    localStorage.setItem('poli_global_carrera', detectedScanMetadata.carrera);
-  }
-
-  // REGLA 5: Ocultar y limpiar completamente la lista temporal para que NADA quede flotando
-  dismissScanReview();
-
-  saveActiveUserData();
-  updateHeaderUserChip();
-  if (userProfile.cedula) syncTurnoUI(userProfile.cedula);
-
-  renderGradesDatabaseTable();
   renderSemesters(userProfile.carrera, userProfile.mencion);
   updateProgressStats();
   renderTabs();
   renderList();
   renderSummary();
 
-  showToast('🎉 ¡Notas guardadas y acumuladas con éxito en tu Base de Datos!');
+  // Avisos al usuario
+  if (blockedFiles.length > 0) {
+    var blockMsg = blockedFiles[0].msg;
+    showToast(blockMsg);
+    alert(blockMsg);
+  } else if (loadedCount > 0) {
+    showToast('🎉 ¡' + loadedCount + ' materias procesadas y ubicadas en tu pensum unificado!');
+  } else {
+    showToast('No se identificaron asignaturas nuevas en los archivos.');
+  }
 }
 
 // ===========================================================================
-// 9. REGLA 5: BASE DE DATOS EN COLUMNAS (TABLA COMPLETA DE RÉCORD ACUMULADO)
+// 7. REGLA 5: UN SOLO MENÚ UNIFICADO DESPLEGABLE POR SEMESTRES (1° AL 10° + ELECTIVAS)
 // ===========================================================================
-function renderGradesDatabaseTable() {
-  var tbody = document.getElementById('gradesDatabaseTbody');
-  var statsBanner = document.getElementById('gradesDbStatsBanner');
-  if (!tbody) return;
+function renderSemesters(carreraKey, mencionKey) {
+  var container = document.getElementById('semestersContainer');
+  if (!container) return;
 
-  var filterText = (document.getElementById('gradesDbSearchInput') ? document.getElementById('gradesDbSearchInput').value : '').toUpperCase().trim();
-  var allCatalog = getAllSubjectsCatalog();
+  var pData = PENSUM[carreraKey] || PENSUM[state.car] || PENSUM['II'];
+  if (!pData) return;
 
-  var gradeEntries = Object.keys(studentGrades).map(function(code) {
-    var g = studentGrades[code];
-    var cat = allCatalog[code] || {};
-    return {
+  var optKey = mencionKey && pData[mencionKey] ? mencionKey : Object.keys(pData)[0];
+  var branch = pData[optKey] || pData[Object.keys(pData)[0]];
+  if (!branch || !branch.rows) return;
+
+  var rows = branch.rows;
+  var semGroups = {};
+  rows.forEach(function(m) {
+    if (m.c === '-') return;
+    if (!semGroups[m.s]) semGroups[m.s] = [];
+    semGroups[m.s].push(m);
+  });
+
+  var semOrder = ['I','II','III','IV','V','VI','VII','VIII','IX','X','E'];
+  var semLabels = {
+    'I': '1° Semestre',
+    'II': '2° Semestre',
+    'III': '3° Semestre',
+    'IV': '4° Semestre',
+    'V': '5° Semestre',
+    'VI': '6° Semestre',
+    'VII': '7° Semestre',
+    'VIII': '8° Semestre',
+    'IX': '9° Semestre',
+    'X': '10° Semestre',
+    'E': 'Electivas Profesionales'
+  };
+
+  var html = '';
+
+  semOrder.forEach(function(sCode, sIdx) {
+    if (!semGroups[sCode]) return;
+    var semList = semGroups[sCode];
+    var semTotalUc = 0;
+    var semApprovedUc = 0;
+    var hasActiveSubject = false;
+
+    var rowsHtml = semList.map(function(m) {
+      semTotalUc += m.u;
+      var g = studentGrades[m.c];
+      var isOk = false;
+      var scoreVal = '';
+      var cssVal = '';
+
+      if (g) {
+        hasActiveSubject = true;
+        scoreVal = g.score != null ? String(g.score) : '';
+        cssVal = g.css || '';
+        var num = parseFloat(scoreVal.replace(',', '.'));
+        isOk = g.status === 'ok' || (!isNaN(num) && num >= 5.0);
+        if (isOk) semApprovedUc += m.u;
+      }
+
+      var st = getSubjectStatus(m.c, m);
+
+      return `
+        <tr style="border-bottom:1px solid var(--card-border);background:${isOk ? '#F0FDF4' : '#FFF'};transition:background 0.15s ease;">
+          <td style="padding:10px 12px;font-weight:800;color:var(--unexpo-navy);">${esc(m.c)}</td>
+          <td style="padding:10px 12px;">
+            <div style="font-weight:700;color:var(--unexpo-navy);">${esc(m.n)}</div>
+            <small style="color:var(--text-muted);font-size:11px;">${m.p ? 'Prelación: ' + m.p : 'Sin prelación'} ${m.k ? '· Co-req: ' + m.k : ''}</small>
+          </td>
+          <td style="padding:10px 12px;text-align:center;font-weight:800;">${m.u}</td>
+          <td style="padding:10px 12px;text-align:center;">
+            <input type="text" value="${esc(cssVal)}" class="form-control" style="width:62px;display:inline-block;padding:3px;text-align:center;font-size:12px;" onchange="updateSubjectCss('${m.c}', this.value)" placeholder="Sec">
+          </td>
+          <td style="padding:10px 12px;text-align:center;">
+            <input type="text" value="${esc(scoreVal)}" class="form-control" style="width:74px;display:inline-block;padding:3px;text-align:center;font-weight:900;color:var(--unexpo-navy);font-size:13px;" onchange="updateSubjectGrade('${m.c}', this.value)" placeholder="—">
+          </td>
+          <td style="padding:10px 12px;text-align:center;">
+            <span class="badge ${st.badgeClass}" style="font-size:11px;" title="${esc(st.tooltip)}">${st.label}</span>
+          </td>
+          <td style="padding:10px 12px;text-align:right;">
+            ${g ? `
+              <button type="button" class="btn btn-secondary btn-sm" style="color:#DC2626;padding:2px 7px;font-size:11px;" onclick="clearSubjectGrade('${m.c}')" title="Limpiar nota de esta materia">✕</button>
+            ` : `
+              <button type="button" class="btn btn-secondary btn-sm" style="color:#059669;padding:2px 7px;font-size:11px;" onclick="quickApproveSubject('${m.c}', ${m.u})" title="Aprobar rápidamente">+✓</button>
+            `}
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Mantener abierto el primer semestre o semestres que tengan notas cargadas
+    var isOpen = sIdx === 0 || hasActiveSubject;
+
+    html += `
+      <div class="semester-block" style="border:1.5px solid var(--card-border);border-radius:10px;margin-bottom:12px;overflow:hidden;background:#FFF;box-shadow:var(--shadow-sm);">
+        <div class="semester-header" onclick="toggleSemesterAccordion(this)" style="cursor:pointer;background:var(--paper-bg);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--card-border);user-select:none;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="color:var(--cat-yellow-dark);font-size:18px;">📘</span>
+            <b style="font-size:14.5px;color:var(--unexpo-navy);">${semLabels[sCode] || sCode}</b>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:12.5px;color:var(--text-muted);font-weight:800;">
+              ${semApprovedUc} / ${semTotalUc} U.C.
+            </span>
+            <span class="sem-toggle-icon" style="font-size:12px;color:var(--text-muted);">${isOpen ? '▲' : '▼'}</span>
+          </div>
+        </div>
+        <div class="semester-body" style="display:${isOpen ? 'block' : 'none'};padding:0;overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+              <tr style="background:#071530;color:#FFF;text-align:left;">
+                <th style="padding:9px 12px;width:95px;">Código</th>
+                <th style="padding:9px 12px;">Asignatura</th>
+                <th style="padding:9px 12px;text-align:center;width:60px;">U.C.</th>
+                <th style="padding:9px 12px;text-align:center;width:80px;">CSS (Sec)</th>
+                <th style="padding:9px 12px;text-align:center;width:95px;">Nota Exacta</th>
+                <th style="padding:9px 12px;text-align:center;width:125px;">Estado</th>
+                <th style="padding:9px 12px;text-align:right;width:65px;">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function toggleSemesterAccordion(headerEl) {
+  var body = headerEl.nextElementSibling;
+  var icon = headerEl.querySelector('.sem-toggle-icon');
+  if (!body) return;
+  var isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'block' : 'none';
+  if (icon) icon.textContent = isHidden ? '▲' : '▼';
+}
+
+function updateSubjectGrade(code, val) {
+  val = String(val).trim();
+  if (!val || val === '—') {
+    clearSubjectGrade(code);
+    return;
+  }
+  var num = parseFloat(val.replace(',', '.'));
+  var isOk = !isNaN(num) ? num >= 5.0 : (val.toUpperCase().includes('AP') || val.toUpperCase() === 'EQ');
+
+  if (!studentGrades[code]) {
+    var cat = getAllSubjectsCatalog()[code] || {};
+    studentGrades[code] = {
       code: code,
-      name: g.name || cat.n || code,
-      sem: g.sem || cat.s || '—',
-      uc: g.uc || cat.u || parseInt(code.slice(-1), 10) || 3,
-      css: g.css || '',
-      score: g.score != null ? g.score : (g.status === 'ok' ? '5,0' : '4,0'),
-      status: g.status || 'ok'
+      name: cat.n || code,
+      sem: cat.s || '—',
+      uc: cat.u || 3,
+      css: '',
+      score: val,
+      status: isOk ? 'ok' : 'rep'
     };
+  } else {
+    studentGrades[code].score = val;
+    studentGrades[code].status = isOk ? 'ok' : 'rep';
+  }
+
+  saveActiveUserData();
+  renderSemesters(userProfile.carrera, userProfile.mencion);
+  updateProgressStats();
+  renderTabs();
+  renderList();
+  renderSummary();
+}
+
+function updateSubjectCss(code, val) {
+  val = String(val).trim();
+  if (studentGrades[code]) {
+    studentGrades[code].css = val;
+    saveActiveUserData();
+  } else if (val) {
+    var cat = getAllSubjectsCatalog()[code] || {};
+    studentGrades[code] = {
+      code: code,
+      name: cat.n || code,
+      sem: cat.s || '—',
+      uc: cat.u || 3,
+      css: val,
+      score: null,
+      status: 'cur'
+    };
+    saveActiveUserData();
+    renderSemesters(userProfile.carrera, userProfile.mencion);
+  }
+}
+
+function clearSubjectGrade(code) {
+  if (studentGrades[code]) {
+    delete studentGrades[code];
+    saveActiveUserData();
+    renderSemesters(userProfile.carrera, userProfile.mencion);
+    updateProgressStats();
+    renderTabs();
+    renderList();
+    renderSummary();
+    showToast('Nota de ' + code + ' eliminada');
+  }
+}
+
+function quickApproveSubject(code, uc) {
+  var inputScore = prompt('Introduce la calificación exacta para ' + code + ' (ej: 7,4 o 5,0):', '7,0');
+  if (inputScore !== null) {
+    updateSubjectGrade(code, inputScore);
+  }
+}
+
+function quickApprovePrompt() {
+  var sem = prompt('¿Qué semestre deseas marcar como aprobado? (Escribe I, II, III, IV, V, VI, VII, VIII, IX o X):', 'I');
+  if (!sem) return;
+  var gradeStr = prompt('Calificación exacta para las materias de este semestre (ej: 7,0):', '7,0');
+  if (!gradeStr) return;
+
+  var pData = PENSUM[userProfile.carrera] || PENSUM[state.car] || PENSUM['II'];
+  if (!pData) return;
+  var optKey = userProfile.mencion && pData[userProfile.mencion] ? userProfile.mencion : Object.keys(pData)[0];
+  var rows = pData[optKey].rows;
+
+  rows.forEach(function(m) {
+    if (m.s === sem && m.c !== '-') {
+      updateSubjectGrade(m.c, gradeStr);
+    }
   });
 
-  // Ordenar por semestre y código
-  var semWeights = { 'I':1, 'II':2, 'III':3, 'IV':4, 'V':5, 'VI':6, 'VII':7, 'VIII':8, 'IX':9, 'X':10, 'E':11, '—':12 };
-  gradeEntries.sort(function(a, b) {
-    var wa = semWeights[a.sem] || 99;
-    var wb = semWeights[b.sem] || 99;
-    if (wa !== wb) return wa - wb;
-    return a.code.localeCompare(b.code);
-  });
+  showToast('Semestre ' + sem + ' aprobado con nota ' + gradeStr);
+}
 
-  // Calcular estadísticas acumuladas
-  var totalCount = gradeEntries.length;
-  var approvedCount = 0;
-  var totalApprovedUc = 0;
+// ===========================================================================
+// 8. REGLA 6: BOTÓN DE BORRAR / REINICIAR A CERO
+// ===========================================================================
+function resetAllGrades() {
+  var ok = confirm('⚠️ ¿Estás seguro de que deseas borrar todas las notas cargadas y reiniciar tu pensum y horario a cero?\n\nEsta acción no se puede deshacer.');
+  if (ok) {
+    studentGrades = {};
+    state.sel = {};
+    saveActiveUserData();
+    renderSemesters(userProfile.carrera, userProfile.mencion);
+    updateProgressStats();
+    renderTabs();
+    renderList();
+    renderSummary();
+    showToast('🗑️ Todas las notas y horario han sido reiniciados a cero');
+  }
+}
+
+// ===========================================================================
+// 9. CÁLCULO DE ESTADÍSTICAS LEYENDO ÚNICAMENTE EL PENSUM UNIFICADO (REGLA 5)
+// ===========================================================================
+function updateProgressStats() {
+  var carreraKey = userProfile.carrera || state.car || 'II';
+  var pData = PENSUM[carreraKey] || PENSUM['II'];
+  if (!pData) return;
+
+  var optKey = userProfile.mencion && pData[userProfile.mencion] ? userProfile.mencion : Object.keys(pData)[0];
+  var rows = pData[optKey].rows;
+
+  var totalUc = 0;
+  var approvedUc = 0;
   var sumScoreWeighted = 0;
   var sumScoreSimple = 0;
+  var approvedCount = 0;
 
-  gradeEntries.forEach(function(e) {
-    var num = parseFloat(String(e.score).replace(',', '.'));
-    var isOk = e.status === 'ok' || (!isNaN(num) && num >= 5.0);
-    if (isOk) {
+  rows.forEach(function(m) {
+    if (m.c === '-') return;
+    totalUc += m.u;
+    var g = studentGrades[m.c];
+    var isApp = isSubjectApproved(m.c);
+
+    if (isApp) {
+      approvedUc += m.u;
       approvedCount++;
-      totalApprovedUc += e.uc;
-      if (!isNaN(num)) {
-        sumScoreWeighted += num * e.uc;
-        sumScoreSimple += num;
+      var scoreVal = g && g.score != null ? parseFloat(String(g.score).replace(',', '.')) : 5.0;
+      if (!isNaN(scoreVal) && scoreVal > 0) {
+        sumScoreWeighted += scoreVal * m.u;
+        sumScoreSimple += scoreVal;
+      } else {
+        sumScoreWeighted += 5.0 * m.u;
+        sumScoreSimple += 5.0;
       }
     }
   });
 
+  // Cálculo del Semestre Actual basado en avance académico UNEXPO (~17 UC por semestre)
+  var currentSem = Math.min(10, Math.max(1, Math.floor(approvedUc / 17) + 1));
+
+  var pct = totalUc > 0 ? ((approvedUc / totalUc) * 100).toFixed(2) : '0.00';
   var promedioSimple = approvedCount > 0 ? (sumScoreSimple / approvedCount).toFixed(2) : '0.00';
-  var indiceOficial = totalApprovedUc > 0 ? (sumScoreWeighted / totalApprovedUc).toFixed(2) : '0.00';
+  var indiceOficial = approvedUc > 0 ? (sumScoreWeighted / approvedUc).toFixed(2) : '0.00';
 
-  if (statsBanner) {
-    statsBanner.innerHTML = `
-      <div>
-        <b>Total Asignaturas en Récord:</b> <span style="color:var(--unexpo-navy);font-weight:900;">${totalCount}</span> ·
-        <b>U.C. Aprobadas:</b> <span style="color:#059669;font-weight:900;">${totalApprovedUc}</span>
-      </div>
-      <div>
-        <b>Promedio (1-9):</b> <span style="font-weight:900;">${promedioSimple}</span> ·
-        <b style="color:var(--unexpo-navy);">ÍNDICE OFICIAL PONDERADO:</b> <span style="background:var(--cat-yellow);color:var(--unexpo-navy);padding:2px 8px;border-radius:4px;font-weight:900;">${indiceOficial} / 9.0</span>
-      </div>
-    `;
+  var statPct = document.getElementById('statPorcentaje');
+  var statUcEl = document.getElementById('statUc');
+  var statProm = document.getElementById('statPromedio');
+  var statSem = document.getElementById('statSemestre');
+  var statBadge = document.getElementById('statPromedioBadge');
+  var pBar = document.getElementById('progressBar');
+  var pText = document.getElementById('progressText');
+  var radialCircle = document.getElementById('radialProgressCircle');
+
+  if (statPct) statPct.textContent = Math.round(parseFloat(pct)) + '%';
+  if (statUcEl) statUcEl.textContent = approvedUc + ' / ' + totalUc;
+  if (statProm) statProm.textContent = promedioSimple;
+  if (statSem) statSem.textContent = currentSem + '°';
+  if (statBadge) statBadge.textContent = 'ÍNDICE OFICIAL: ' + indiceOficial + ' / 9.0';
+  if (pBar) pBar.style.width = Math.min(100, parseFloat(pct)) + '%';
+  if (pText) pText.textContent = pct + '% completado (' + approvedUc + ' de ' + totalUc + ' U.C.)';
+
+  if (radialCircle) {
+    var circumference = 377;
+    var offset = circumference - (parseFloat(pct) / 100) * circumference;
+    radialCircle.style.strokeDashoffset = offset;
   }
-
-  // Filtrado de búsqueda
-  var filteredEntries = gradeEntries;
-  if (filterText) {
-    filteredEntries = gradeEntries.filter(function(e) {
-      return e.code.toUpperCase().includes(filterText) ||
-             e.name.toUpperCase().includes(filterText) ||
-             e.sem.toUpperCase().includes(filterText);
-    });
-  }
-
-  if (filteredEntries.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted);font-size:13.5px;">
-          ${totalCount === 0 ? 'No hay materias cargadas en la Base de Datos aún. Pulsa <b>"📥 Subir Mis Notas"</b> o <b>"+ Agregar Materia"</b> para iniciar tu récord.' : 'No se encontraron materias que coincidan con la búsqueda.'}
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  tbody.innerHTML = filteredEntries.map(function(e) {
-    var isOk = e.status === 'ok';
-    return `
-      <tr style="border-bottom:1px solid var(--card-border);background:${isOk ? '#FFF' : '#FEF2F2'};transition:background 0.15s ease;">
-        <td style="padding:8px 12px;font-weight:800;color:var(--unexpo-navy);">${esc(e.code)}</td>
-        <td style="padding:8px 12px;font-weight:600;">${esc(e.name)}</td>
-        <td style="padding:8px 12px;text-align:center;font-weight:700;">${esc(e.sem)}</td>
-        <td style="padding:8px 12px;text-align:center;font-weight:800;">${e.uc}</td>
-        <td style="padding:8px 12px;text-align:center;">
-          <input type="text" value="${esc(e.css)}" class="form-control" style="width:65px;padding:3px;text-align:center;font-size:12px;" onchange="updateDatabaseRowCss('${e.code}', this.value)" placeholder="Sec">
-        </td>
-        <td style="padding:8px 12px;text-align:center;">
-          <input type="text" value="${esc(String(e.score))}" class="form-control" style="width:75px;padding:3px;text-align:center;font-weight:900;color:var(--unexpo-navy);font-size:13px;" onchange="updateDatabaseRowGrade('${e.code}', this.value)">
-        </td>
-        <td style="padding:8px 12px;text-align:center;">
-          <button type="button" class="btn btn-sm ${isOk ? 'btn-primary' : 'btn-danger'}" style="padding:3px 9px;font-size:11px;font-weight:800;" onclick="toggleDatabaseRowStatus('${e.code}')">
-            ${isOk ? '✅ Aprobada' : '❌ Reprobada'}
-          </button>
-        </td>
-        <td style="padding:8px 12px;text-align:right;">
-          <button type="button" class="btn btn-secondary btn-sm" style="color:#DC2626;padding:2px 7px;font-size:12px;" onclick="deleteDatabaseRow('${e.code}')" title="Eliminar materia del récord">🗑️</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function updateDatabaseRowGrade(code, val) {
-  if (studentGrades[code]) {
-    studentGrades[code].score = val;
-    studentGrades[code]._origScore = val;
-    var num = parseFloat(String(val).replace(',', '.'));
-    if (!isNaN(num)) {
-      studentGrades[code].status = num >= 5.0 ? 'ok' : 'rep';
-    }
-    saveActiveUserData();
-    renderGradesDatabaseTable();
-    renderSemesters(userProfile.carrera, userProfile.mencion);
-    updateProgressStats();
-  }
-}
-
-function updateDatabaseRowCss(code, val) {
-  if (studentGrades[code]) {
-    studentGrades[code].css = val;
-    saveActiveUserData();
-  }
-}
-
-function toggleDatabaseRowStatus(code) {
-  if (studentGrades[code]) {
-    var cur = studentGrades[code].status;
-    studentGrades[code].status = cur === 'ok' ? 'rep' : 'ok';
-    if (studentGrades[code].status === 'ok') {
-      var num = parseFloat(String(studentGrades[code].score).replace(',', '.'));
-      if (isNaN(num) || num < 5.0) studentGrades[code].score = '5,0';
-    } else {
-      var num = parseFloat(String(studentGrades[code].score).replace(',', '.'));
-      if (isNaN(num) || num >= 5.0) studentGrades[code].score = '4,0';
-    }
-    saveActiveUserData();
-    renderGradesDatabaseTable();
-    renderSemesters(userProfile.carrera, userProfile.mencion);
-    updateProgressStats();
-  }
-}
-
-function deleteDatabaseRow(code) {
-  if (confirm('¿Deseas eliminar ' + code + ' de tu Base de Datos de calificaciones?')) {
-    delete studentGrades[code];
-    saveActiveUserData();
-    renderGradesDatabaseTable();
-    renderSemesters(userProfile.carrera, userProfile.mencion);
-    updateProgressStats();
-    showToast('Materia eliminada del récord');
-  }
-}
-
-function openAddGradeModal() {
-  var modal = document.getElementById('modalAddManualSubject');
-  if (modal) {
-    document.getElementById('manualSubjCode').value = '';
-    document.getElementById('manualSubjName').value = '';
-    document.getElementById('manualSubjSem').value = 'I';
-    document.getElementById('manualSubjUc').value = '3';
-    document.getElementById('manualSubjCss').value = '01';
-    document.getElementById('manualSubjScore').value = '7,0';
-    modal.style.display = 'flex';
-    modal.classList.add('active');
-  }
-}
-
-function autoFillManualSubject(code) {
-  var allCatalog = getAllSubjectsCatalog();
-  if (allCatalog[code]) {
-    var s = allCatalog[code];
-    document.getElementById('manualSubjName').value = s.n || '';
-    document.getElementById('manualSubjSem').value = s.s || 'I';
-    document.getElementById('manualSubjUc').value = s.u || 3;
-  }
-}
-
-function saveManualSubject() {
-  var code = (document.getElementById('manualSubjCode').value || '').trim().toUpperCase();
-  var name = (document.getElementById('manualSubjName').value || '').trim();
-  var sem = (document.getElementById('manualSubjSem').value || '—').trim();
-  var uc = parseInt(document.getElementById('manualSubjUc').value, 10) || 3;
-  var css = (document.getElementById('manualSubjCss').value || '').trim();
-  var score = (document.getElementById('manualSubjScore').value || '5,0').trim();
-
-  if (!code) {
-    alert('Por favor introduce el código de la materia');
-    return;
-  }
-
-  var num = parseFloat(String(score).replace(',', '.'));
-  var isOk = !isNaN(num) ? num >= 5.0 : true;
-
-  studentGrades[code] = {
-    code: code,
-    name: name || code,
-    sem: sem,
-    uc: uc,
-    css: css,
-    score: score,
-    _origScore: score,
-    status: isOk ? 'ok' : 'rep',
-    updatedAt: new Date().toLocaleDateString('es-VE')
-  };
-
-  closeModal('modalAddManualSubject');
-  saveActiveUserData();
-  renderGradesDatabaseTable();
-  renderSemesters(userProfile.carrera, userProfile.mencion);
-  updateProgressStats();
-  showToast('✅ Asignatura ' + code + ' agregada al récord con éxito');
 }
 
 // ===========================================================================
-// 10. REGLA 6: GALERÍA DE DOCUMENTOS Y VISOR INTERACTIVO CON ZOOM / PAN / 90°
+// 10. REGLA 7: SECCIÓN Y VISOR INTERACTIVO DE DOCUMENTOS ("📂 Mis Documentos")
 // ===========================================================================
 function renderDocumentGallery() {
   var gal = document.getElementById('docGallery');
@@ -5079,7 +4978,6 @@ function renderDocumentGallery() {
   }).join('');
 }
 
-// ESTADO GLOBAL DEL VISOR INTERACTIVO
 var docViewerState = {
   doc: null,
   zoom: 1.0,
@@ -5102,7 +5000,6 @@ function initDocViewerControls() {
   var viewport = document.getElementById('docViewerViewport');
   if (!viewport) return;
 
-  // Mouse Drag / Panning
   viewport.addEventListener('mousedown', function(e) {
     if (e.button !== 0) return;
     docViewerState.isDragging = true;
@@ -5125,14 +5022,12 @@ function initDocViewerControls() {
     }
   });
 
-  // Mouse Wheel Zoom
   viewport.addEventListener('wheel', function(e) {
     e.preventDefault();
     var delta = e.deltaY < 0 ? 0.2 : -0.2;
     zoomDocViewer(delta);
   }, { passive: false });
 
-  // Touch Events (Arrastre con un dedo y Pinch Zoom con dos dedos)
   viewport.addEventListener('touchstart', function(e) {
     if (e.touches.length === 1) {
       docViewerState.isDragging = true;
@@ -5213,7 +5108,7 @@ async function renderDocViewerPdfPage(pageNum) {
 
   try {
     var page = await docViewerState.pdfDoc.getPage(pageNum);
-    var viewport = page.getViewport({ scale: 2.0 }); // Alta resolución
+    var viewport = page.getViewport({ scale: 2.0 });
     var canvas = document.createElement('canvas');
     canvas.width = viewport.width;
     canvas.height = viewport.height;
@@ -5360,128 +5255,7 @@ function removeUploadedPlanilla() {
   }
 }
 
-// ================= PENSUM ACADÉMICO Y CONTROL DE ESTUDIOS =================
-function renderSemesters(carreraKey, mencionKey) {
-  const container = $('semestersContainer');
-  if (!container) return;
-
-  const pData = PENSUM[carreraKey] || PENSUM['II'];
-  if (!pData) return;
-
-  if (!mencionKey) {
-    mencionKey = userProfile.mencion && pData[userProfile.mencion] ? userProfile.mencion : Object.keys(pData)[0];
-  }
-
-  const activeBranch = pData[mencionKey] || pData[Object.keys(pData)[0]];
-  const rows = activeBranch.rows;
-
-  const semGroups = {};
-  rows.forEach(m => {
-    if (!semGroups[m.s]) semGroups[m.s] = [];
-    semGroups[m.s].push(m);
-  });
-
-  const semOrder = ['I','II','III','IV','V','VI','VII','VIII','IX','X','E'];
-  let html = '';
-
-  semOrder.forEach(sCode => {
-    if (!semGroups[sCode]) return;
-    const semList = semGroups[sCode];
-    let semTotalUc = 0;
-    let semApprovedUc = 0;
-
-    let subRows = '';
-    semList.forEach(m => {
-      semTotalUc += m.u;
-      const g = studentGrades[m.c] || { status: 'pen', score: 0 };
-      if (g.status === 'ok') semApprovedUc += m.u;
-
-      const st = getSubjectStatus(m.c, m);
-
-      subRows += `
-        <div class="subject-item" onclick="cycleSubjectStatus('${m.c}', ${m.u})">
-          <div>
-            <div style="font-weight:800;color:var(--unexpo-navy);font-size:13.5px;">${m.n}</div>
-            <small style="color:var(--text-muted);font-weight:700;">${m.c} · ${m.u} U.C. ${m.p ? ' · Prelación: ' + m.p : ''} ${m.k ? ' · Co-requisito: ' + m.k : ''}</small>
-          </div>
-          <div>
-            <span class="badge ${st.badgeClass}" title="${esc(st.tooltip)}">${st.label}</span>
-          </div>
-        </div>
-      `;
-    });
-
-    html += `
-      <div class="semester-block">
-        <div class="semester-header" onclick="toggleSemesterAccordion(this)">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="color:var(--cat-yellow-dark);font-size:18px;">📘</span>
-            <span>${sCode === 'E' ? 'Electivas Profesionales' : sCode + ' Semestre'}</span>
-          </div>
-          <div style="font-size:12.5px;color:var(--text-muted);font-weight:700;">
-            ${semApprovedUc} / ${semTotalUc} U.C.
-          </div>
-        </div>
-        <div class="semester-body">
-          ${subRows}
-        </div>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
-function toggleSemesterAccordion(headerEl) {
-  const body = headerEl.nextElementSibling;
-  if (!body) return;
-  body.style.display = (body.style.display === 'none') ? 'block' : 'none';
-}
-
-function cycleSubjectStatus(code, uc) {
-  const current = studentGrades[code] || { status: 'pen', score: 0 };
-  let nextStatus = 'cur';
-  let nextScore = 0;
-
-  if (current.status === 'pen') {
-    nextStatus = 'cur';
-  } else if (current.status === 'cur') {
-    nextStatus = 'ok';
-    const inputScore = prompt('Introduce la calificación obtenida exacta (1 a 9 pts, ej: 7.50):', '7.00');
-    nextScore = inputScore ? Math.min(9, Math.max(1, parseFloat(inputScore) || 5.00)) : 5.00;
-  } else {
-    nextStatus = 'pen';
-    nextScore = 0;
-  }
-
-  studentGrades[code] = { status: nextStatus, score: nextScore };
-  saveActiveUserData();
-  renderSemesters(userProfile.carrera, userProfile.mencion);
-  updateProgressStats();
-}
-
-function quickApprovePrompt() {
-  const sem = prompt('¿Qué semestre deseas marcar como aprobado? (Escribe I, II, III, IV, V, VI, VII, VIII, IX o X):', 'I');
-  if (!sem) return;
-  const gradeStr = prompt('Calificación promedio para las materias de este semestre (5 a 9 pts):', '7');
-  const grade = Math.min(9, Math.max(5, parseFloat(gradeStr) || 7));
-
-  const pData = PENSUM[userProfile.carrera] || PENSUM['II'];
-  if (!pData) return;
-  const optKey = userProfile.mencion && pData[userProfile.mencion] ? userProfile.mencion : Object.keys(pData)[0];
-  const list = pData[optKey].rows.filter(r => r.s.toUpperCase() === sem.toUpperCase());
-
-  if (!list.length) return alert('No se encontraron materias para el semestre indicado.');
-
-  list.forEach(r => {
-    studentGrades[r.c] = { status: 'ok', score: grade };
-  });
-
-  saveActiveUserData();
-  renderSemesters(userProfile.carrera, userProfile.mencion);
-  updateProgressStats();
-  showToast('¡Semestre ' + sem + ' aprobado con éxito!');
-}
+// [PENSUM Y CONTROL DE ESTUDIOS GESTIONADO POR MOTOR UNIVERSAL]
 
 // ================= PLANILLA DIGITAL =================
 function updatePlanillaView() {
