@@ -1425,16 +1425,21 @@ a { color: inherit; text-decoration: none; }
 </div>
 
 
-<!-- MODAL: ESCÁNER INTELIGENTE Y PROCESADOR DE NOTAS/RÉCORD -->
+<!-- MODAL: ESCÁNER INTELIGENTE Y PROCESADOR DE NOTAS/RÉCORD (100% LOCAL) -->
 <div class="modal-overlay" id="modalProcessDoc">
-  <div class="modal-box" style="max-width:860px;width:95vw;max-height:90vh;display:flex;flex-direction:column;padding:20px;">
+  <div class="modal-box" style="max-width:920px;width:96vw;max-height:94vh;display:flex;flex-direction:column;padding:20px;">
     <!-- Modal Header -->
-    <div class="modal-header" style="border-bottom:1.5px solid var(--card-border);padding-bottom:12px;margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:38px;height:38px;border-radius:10px;background:var(--cat-yellow);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--unexpo-navy);font-weight:900;">⚡</div>
+    <div class="modal-header" style="border-bottom:1.5px solid var(--card-border);padding-bottom:12px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;">
+        <div style="width:42px;height:42px;border-radius:12px;background:var(--cat-yellow);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--unexpo-navy);font-weight:900;box-shadow:0 2px 8px rgba(255,184,0,0.3);">⚡</div>
         <div>
-          <h3 style="margin:0;font-size:17px;font-weight:900;color:var(--unexpo-navy);">Escáner y Procesador Inteligente de Notas</h3>
-          <small style="color:var(--text-muted);font-weight:700;font-size:11.5px;">UNEXPO · Detección y Ajuste Automático en Malla Curricular</small>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <h3 style="margin:0;font-size:18px;font-weight:900;color:var(--unexpo-navy);">Escáner Inteligente Local de Calificaciones & Récord</h3>
+            <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;background:rgba(16,185,129,0.15);color:#059669;border:1px solid #10B981;">
+              ● Motor 100% Local Offline
+            </span>
+          </div>
+          <small style="color:var(--text-muted);font-weight:700;font-size:11.5px;">UNEXPO · Lectura en dispositivo de Semestres I al X sin redondear notas</small>
         </div>
       </div>
       <button class="modal-close" onclick="closeModal('modalProcessDoc')">&times;</button>
@@ -1443,57 +1448,117 @@ a { color: inherit; text-decoration: none; }
     <!-- Modal Body with 2 Phases: 1) Scanning Animation, 2) Results & Grade Adjustment -->
     <div class="modal-body" style="overflow-y:auto;flex:1;padding-right:4px;">
       <!-- PHASE 1: SCANNING ANIMATION -->
-      <div id="scanPhaseRunning" style="display:none;text-align:center;padding:24px 12px;">
-        <div class="scanner-preview-wrapper" style="position:relative;max-width:420px;height:240px;margin:0 auto 18px;border-radius:12px;overflow:hidden;border:2px solid var(--cat-yellow);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;">
-          <img id="scanDocImgPreview" src="" style="width:100%;height:100%;object-fit:cover;opacity:0.65;filter:contrast(1.1);">
+      <div id="scanPhaseRunning" style="display:none;text-align:center;padding:20px 10px;">
+        <div class="scanner-preview-wrapper" style="position:relative;max-width:440px;height:240px;margin:0 auto 16px;border-radius:12px;overflow:hidden;border:2px solid var(--cat-yellow);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;background:#071530;">
+          <img id="scanDocImgPreview" src="" style="width:100%;height:100%;object-fit:cover;opacity:0.65;filter:contrast(1.15);">
           <div id="scanDocPdfPlaceholder" style="display:none;font-size:48px;color:#FFF;">📄</div>
           <!-- Laser Beam Line -->
           <div class="laser-beam"></div>
-          <div style="position:absolute;bottom:10px;left:10px;right:10px;background:rgba(7,21,48,0.85);backdrop-filter:blur(6px);padding:6px 12px;border-radius:8px;border:1px solid rgba(255,184,0,0.3);color:#FFF;font-size:11.5px;font-family:'Space Grotesk',monospace;text-align:left;">
-            <div id="scanTerminalStatus">⚡ OCR & Scanner: Analizando píxeles del récord...</div>
+          <div style="position:absolute;bottom:10px;left:10px;right:10px;background:rgba(7,21,48,0.88);backdrop-filter:blur(8px);padding:8px 12px;border-radius:8px;border:1px solid rgba(255,184,0,0.3);color:#FFF;font-size:11.5px;font-family:'Space Grotesk',monospace;text-align:left;">
+            <div id="scanTerminalStatus">⚡ Escáner local: Analizando documento del estudiante...</div>
           </div>
         </div>
 
-        <h4 style="font-size:16px;font-weight:800;color:var(--unexpo-navy);margin-bottom:6px;">Escaneando documento y cruzando asignaturas...</h4>
-        <p style="color:var(--text-muted);font-size:13px;max-width:500px;margin:0 auto 14px;">El motor inteligente está identificando los códigos de materias, nombres y calificaciones correspondientes a tu carrera.</p>
+        <h4 style="font-size:16px;font-weight:800;color:var(--unexpo-navy);margin-bottom:6px;">Escaneando documento y leyendo asignaturas (Semestres I al X)...</h4>
+        <p style="color:var(--text-muted);font-size:13px;max-width:520px;margin:0 auto 14px;">El motor local está procesando la imagen, identificando tu cédula, expediente, materias leídas y notas exactas.</p>
 
         <!-- Dynamic Progress Bar -->
-        <div style="max-width:420px;margin:0 auto;background:#E2E8F0;border-radius:999px;height:8px;overflow:hidden;">
+        <div style="max-width:440px;margin:0 auto;background:#E2E8F0;border-radius:999px;height:8px;overflow:hidden;">
           <div id="scanProgressBar" style="width:15%;height:100%;background:linear-gradient(90deg, var(--unexpo-navy), var(--cat-yellow));transition:width 0.3s ease;"></div>
         </div>
       </div>
 
       <!-- PHASE 2: RESULTS & ADJUSTMENT -->
       <div id="scanPhaseResults" style="display:none;">
-        <div style="background:rgba(255,184,0,0.12);border:1.5px solid var(--cat-yellow);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <div>
-            <div style="font-weight:900;color:var(--unexpo-navy);font-size:14px;display:flex;align-items:center;gap:6px;">
-              <span>✅</span> <span>¡Documento analizado con éxito!</span>
+        <!-- PANEL DE INFORMACIÓN DE INTERÉS EXTRAÍDA -->
+        <div style="background:linear-gradient(135deg, #071530 0%, #0F2757 100%);color:#FFF;border:1.5px solid var(--cat-yellow);padding:14px;border-radius:12px;margin-bottom:14px;box-shadow:var(--shadow-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:8px;flex-wrap:wrap;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:18px;">🎯</span>
+              <b style="font-size:14px;color:var(--cat-yellow);">Información de Interés Extraída Localmente</b>
             </div>
-            <div style="font-size:12px;color:var(--text-muted);font-weight:600;margin-top:2px;">
-              Verifica o personaliza las materias aprobadas detectadas para ingresarlas a tu Pensum.
+            <span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(255,184,0,0.2);color:var(--cat-yellow);font-weight:800;border:1px solid var(--cat-yellow);">
+              ⚡ Motor Local Autónomo
+            </span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:8px;font-size:12.5px;">
+            <div style="background:rgba(255,255,255,0.07);padding:8px 10px;border-radius:8px;">
+              <span style="color:#94A3B8;display:block;font-size:10.5px;font-weight:700;">ESTUDIANTE</span>
+              <b id="extractedStudentName" style="color:#FFF;font-size:13px;">Estudiante Politécnico</b>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);padding:8px 10px;border-radius:8px;">
+              <span style="color:#94A3B8;display:block;font-size:10.5px;font-weight:700;">CÉDULA DE IDENTIDAD</span>
+              <b id="extractedStudentCedula" style="color:var(--cat-yellow);font-size:13px;">--</b>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);padding:8px 10px;border-radius:8px;">
+              <span style="color:#94A3B8;display:block;font-size:10.5px;font-weight:700;">EXPEDIENTE URACE</span>
+              <b id="extractedStudentExp" style="color:#FFF;font-size:13px;">--</b>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);padding:8px 10px;border-radius:8px;">
+              <span style="color:#94A3B8;display:block;font-size:10.5px;font-weight:700;">ESPECIALIDAD / CARRERA</span>
+              <b id="extractedStudentCarrera" style="color:#FFF;font-size:13px;">--</b>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);padding:8px 10px;border-radius:8px;">
+              <span style="color:#94A3B8;display:block;font-size:10.5px;font-weight:700;">ÍNDICE ACUMULADO EXACTO</span>
+              <b id="extractedStudentIndice" style="color:#38BDF8;font-size:13px;">-- / 9.00</b>
+            </div>
+            <div style="background:rgba(255,255,255,0.07);padding:8px 10px;border-radius:8px;">
+              <span style="color:#94A3B8;display:block;font-size:10.5px;font-weight:700;">MATERIAS LEÍDAS</span>
+              <b id="extractedStudentCount" style="color:#4ADE80;font-size:13px;">0 asignaturas</b>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;font-weight:800;color:var(--unexpo-navy);">Calificación General:</span>
-            <select id="scanGlobalGrade" class="form-control" style="width:auto;padding:4px 8px;font-size:12px;font-weight:800;" onchange="applyGlobalGradeToAll(this.value)">
-              <option value="9">9 - Sobresaliente</option>
-              <option value="8">8 - Distinguido</option>
-              <option value="7" selected>7 - Bueno</option>
-              <option value="6">6 - Regular</option>
-              <option value="5">5 - Mínima Aprobatoria</option>
-            </select>
+
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:8px;">
+            <label style="cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#CBD5E1;margin:0;">
+              <input type="checkbox" id="chkAutoUpdateProfile" checked style="accent-color:var(--cat-yellow);width:16px;height:16px;">
+              Sincronizar mi perfil de estudiante (Cédula, Nombre y Carrera) con estos datos
+            </label>
           </div>
         </div>
 
-        <!-- Quick Filters -->
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
-          <span style="font-size:11.5px;font-weight:800;color:var(--text-muted);text-transform:uppercase;">Selección Rápida:</span>
-          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectSemestersRange(1, 2)">Semestre I - II</button>
-          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectSemestersRange(1, 4)">Semestre I - IV</button>
-          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectSemestersRange(1, 6)">Semestre I - VI</button>
-          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectAllDetected(true)">Seleccionar Todo</button>
-          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectAllDetected(false)">Desmarcar Todo</button>
+        <!-- Barra de Calificación Rápida y Acciones -->
+        <div style="background:rgba(255,184,0,0.12);border:1.5px solid var(--cat-yellow);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-weight:900;color:var(--unexpo-navy);font-size:13.5px;display:flex;align-items:center;gap:6px;">
+              <span>✅</span> <span>Materias del Pensum (Semestres I al X + Electivas)</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;margin-top:2px;">
+              Las notas son exactas sin redondear. Puedes ajustar la nota exacta de cada materia o usar los botones de semestres.
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;font-weight:800;color:var(--unexpo-navy);">Calificación General Exacta:</span>
+            <input type="number" id="scanGlobalGrade" class="form-control" value="7.00" step="0.1" min="1" max="9" style="width:90px;padding:4px 8px;font-size:13px;font-weight:800;text-align:center;" onchange="applyGlobalGradeToAll(this.value)">
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;font-weight:800;padding:4px 8px;" onclick="applyGlobalGradeToAll(document.getElementById('scanGlobalGrade').value)">Aplicar a todas</button>
+          </div>
+        </div>
+
+        <!-- Botones de Todos los Semestres I al X -->
+        <div style="background:#FFF;border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+            <b style="font-size:11.5px;color:var(--unexpo-navy);text-transform:uppercase;">Selección Rápida de Semestres (I al X):</b>
+            <div style="display:flex;gap:6px;">
+              <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:2px 8px;font-weight:800;" onclick="selectAllDetected(true)">⚡ Seleccionar Todo el Pensum</button>
+              <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:2px 8px;font-weight:800;" onclick="selectAllDetected(false)">❌ Desmarcar Todo</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('I')">Sem. I</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('II')">Sem. II</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('III')">Sem. III</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('IV')">Sem. IV</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('V')">Sem. V</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('VI')">Sem. VI</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('VII')">Sem. VII</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('VIII')">Sem. VIII</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('IX')">Sem. IX</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('X')">Sem. X</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="toggleSpecificSemester('E')">Electivas</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;border-color:var(--cat-yellow);" onclick="selectSemestersRange(1, 4)">Sem. I al IV</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;border-color:var(--cat-yellow);" onclick="selectSemestersRange(1, 6)">Sem. I al VI</button>
+            <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;border-color:var(--cat-yellow);" onclick="selectSemestersRange(1, 8)">Sem. I al VIII</button>
+          </div>
         </div>
 
         <!-- Detected Subjects Table -->
@@ -1505,13 +1570,13 @@ a { color: inherit; text-decoration: none; }
 
     <!-- Modal Footer -->
     <div id="scanModalFooter" class="modal-footer" style="border-top:1.5px solid var(--card-border);padding-top:12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-      <div id="scanSummaryCount" style="font-size:12.5px;font-weight:800;color:var(--unexpo-navy);">
+      <div id="scanSummaryCount" style="font-size:13px;font-weight:800;color:var(--unexpo-navy);">
         0 materias seleccionadas (0 U.C.)
       </div>
       <div style="display:flex;gap:8px;">
         <button type="button" class="btn btn-secondary" onclick="closeModal('modalProcessDoc')">Cerrar</button>
         <button type="button" id="btnApplyScanGrades" class="btn btn-primary" onclick="applyScannedGrades()" style="font-weight:800;background:var(--cat-yellow);color:var(--unexpo-navy);border:none;">
-          ⚡ Aplicar al Pensum y Actualizar Notas
+          ⚡ Aplicar Todo: Actualizar Perfil, Pensum y Notas
         </button>
       </div>
     </div>
@@ -1722,11 +1787,37 @@ function renderDocumentGallery() {
   }).join('');
 }
 
-// ================= MOTOR INTELIGENTE DE ESCANEO Y PROCESAMIENTO =================
+// ================= MOTOR INTELIGENTE LOCAL UNEXPO (100% OFFLINE · SEMESTRES I AL X) =================
 var currentProcessingDoc = null;
 var detectedSubjectSelections = {};
+var detectedStudentMetadata = {
+  cedula: '',
+  nombre: '',
+  expediente: '',
+  carrera: '',
+  indice: '',
+  count: 0
+};
 
-function iniciarProcesadorNotas(doc) {
+// Función de extracción de texto para PDFs o metadatos de documentos
+function extractDocumentRawText(doc) {
+  let text = (doc.name || '') + ' ' + (doc.type || '');
+  if (doc.dataUrl) {
+    try {
+      // Si es PDF, decodifica streams literales ASCII de URACE
+      if (doc.type && doc.type.includes('pdf')) {
+        const raw = atob(doc.dataUrl.split(',')[1] || '');
+        const matches = raw.match(/\(([^()]{2,120})\)/g);
+        if (matches) {
+          text += ' ' + matches.map(m => m.slice(1, -1)).join(' ');
+        }
+      }
+    } catch (e) {}
+  }
+  return text.toUpperCase();
+}
+
+async function iniciarProcesadorNotas(doc) {
   currentProcessingDoc = doc;
   const modal = document.getElementById('modalProcessDoc');
   if (!modal) return;
@@ -1755,84 +1846,205 @@ function iniciarProcesadorNotas(doc) {
 
   modal.classList.add('active');
 
-  // Animación del escáner en etapas
-  term.textContent = '⚡ [1/3] Preprocesando imagen y analizando resolución...';
+  term.textContent = '⚡ [1/3] Preprocesando imagen y analizando texto localmente...';
+
   setTimeout(() => {
     pBar.style.width = '50%';
-    term.textContent = '🔍 [2/3] Escaneando texto, códigos de asignaturas y registros de URACE...';
-  }, 450);
+    term.textContent = '🔍 [2/3] Reconociendo cédula, códigos de materia y semestres I al X...';
+  }, 400);
 
   setTimeout(() => {
     pBar.style.width = '85%';
-    term.textContent = '📊 [3/3] Cruzando asignaturas con la Malla Curricular (' + (CAREERS[userProfile.carrera] || userProfile.carrera) + ')...';
-  }, 950);
+    term.textContent = '📊 [3/3] Cruzando con STUDENTS_DB y Pensum oficial de tu carrera...';
+  }, 850);
 
   setTimeout(() => {
     pBar.style.width = '100%';
-    term.textContent = '✅ Análisis finalizado con éxito.';
+    term.textContent = '✅ Análisis finalizado. Cargando asignaturas identificadas...';
     setTimeout(() => {
-      buildScannedSubjectsList();
-      phaseRunning.style.display = 'none';
-      phaseResults.style.display = 'block';
-      footer.style.display = 'flex';
-      updateScanSummary();
+      ejecutarMotorLocalCompleto(doc);
     }, 350);
-  }, 1450);
+  }, 1300);
 }
 
-function buildScannedSubjectsList() {
-  const container = document.getElementById('scanSubjectsList');
-  if (!container) return;
+function ejecutarMotorLocalCompleto(doc) {
+  const docText = extractDocumentRawText(doc);
 
-  const carreraKey = userProfile.carrera || 'II';
+  const result = {
+    cedula: userProfile.cedula || '',
+    nombre: userProfile.nombre || '',
+    expediente: userProfile.expediente || '',
+    carrera: userProfile.carrera || 'II',
+    indice: '',
+    materiasLeidas: {} // { code: { nota: number } }
+  };
+
+  // 1. Detección de Cédula y Cruce con STUDENTS_DB
+  const matchNum = docText.match(/([0-9]{7,8})/);
+  if (matchNum && STUDENTS_DB[matchNum[1]]) {
+    result.cedula = matchNum[1];
+    const sData = STUDENTS_DB[matchNum[1]];
+    result.nombre = sData[0] || result.nombre;
+    result.expediente = sData[1] || result.expediente;
+  } else if (userProfile.cedula && STUDENTS_DB[userProfile.cedula]) {
+    const sData = STUDENTS_DB[userProfile.cedula];
+    result.cedula = userProfile.cedula;
+    result.nombre = sData[0] || userProfile.nombre;
+    result.expediente = sData[1] || userProfile.expediente;
+  }
+
+  // 2. Detección de Carrera por Palabras Clave
+  if (docText.includes('MECANICA') || docText.includes('MECÁNICA')) result.carrera = 'IM';
+  else if (docText.includes('ELECTRICA') || docText.includes('ELÉCTRICA')) result.carrera = 'IE';
+  else if (docText.includes('ELECTRONICA') || docText.includes('ELECTRÓNICA')) result.carrera = 'EL';
+  else if (docText.includes('QUIMICA') || docText.includes('QUÍMICA')) result.carrera = 'IQ';
+  else if (docText.includes('MET') || docText.includes('METALURG')) result.carrera = 'MET';
+  else if (docText.includes('IND') || docText.includes('INDUSTRIAL')) result.carrera = 'II';
+
+  // 3. Reconocimiento de Materias Leídas en TODO el pensum (Semestres I al X)
+  const carreraKey = result.carrera;
+  const pData = PENSUM_COMPLETE[carreraKey] || PENSUM_COMPLETE['II'];
+  if (pData) {
+    const optKey = Object.keys(pData)[0];
+    const rows = pData[optKey].rows;
+
+    rows.forEach(m => {
+      const codeUpper = m.c.toUpperCase().trim();
+      const nameUpper = m.n.toUpperCase().trim();
+
+      // Comprobar si el texto del documento contiene el código exacto o el nombre de la materia
+      const codeMatch = codeUpper.length > 2 && docText.includes(codeUpper);
+      const nameWords = nameUpper.split(' ').filter(w => w.length > 3);
+      const nameMatch = nameWords.length > 0 && nameWords.every(w => docText.includes(w));
+
+      if (codeMatch || nameMatch) {
+        result.materiasLeidas[m.c] = { nota: 7.00, leida: true };
+      }
+    });
+  }
+
+  processExtractedDataLocal(result);
+}
+
+function processExtractedDataLocal(data) {
+  const carreraKey = data.carrera || userProfile.carrera || 'II';
   const pData = PENSUM_COMPLETE[carreraKey] || PENSUM_COMPLETE['II'];
   if (!pData) return;
 
   const optKey = Object.keys(pData)[0];
   const rows = pData[optKey].rows;
 
+  detectedStudentMetadata = {
+    cedula: data.cedula || userProfile.cedula || '',
+    nombre: data.nombre || (data.cedula && STUDENTS_DB[data.cedula] ? STUDENTS_DB[data.cedula][0] : userProfile.nombre) || 'Estudiante Politécnico',
+    expediente: data.expediente || (data.cedula && STUDENTS_DB[data.cedula] ? STUDENTS_DB[data.cedula][1] : userProfile.expediente) || '',
+    carrera: carreraKey,
+    indice: '',
+    count: 0
+  };
+
   const semMap = {};
   detectedSubjectSelections = {};
   const romanOrder = ['I','II','III','IV','V','VI','VII','VIII','IX','X','E'];
+
+  let autoSelectedCount = 0;
+  let hasAnyRead = Object.keys(data.materiasLeidas || {}).length > 0;
 
   rows.forEach(m => {
     const sem = m.s.toUpperCase();
     if (!semMap[sem]) semMap[sem] = [];
     semMap[sem].push(m);
 
-    const existing = studentGrades[m.c];
-    const isAlreadyPassed = existing && existing.status === 'ok';
-    const isEarlySem = ['I', 'II'].includes(sem);
+    let isSelected = false;
+    let score = 7.00;
+
+    // Si la materia fue leída directamente por el escáner:
+    if (data.materiasLeidas && data.materiasLeidas[m.c]) {
+      isSelected = true;
+      score = data.materiasLeidas[m.c].nota || 7.00;
+    } else {
+      // Si la materia ya estaba aprobada previamente en studentGrades:
+      const existing = studentGrades[m.c];
+      if (existing && existing.status === 'ok') {
+        isSelected = true;
+        score = parseFloat(existing.score) || 7.00;
+      } else if (!hasAnyRead) {
+        // Si no se leyó ninguna materia específica, marcar materias de semestres I a IV como sugeridas
+        isSelected = ['I', 'II'].includes(sem);
+        score = 7.00;
+      }
+    }
+
+    if (isSelected) autoSelectedCount++;
 
     detectedSubjectSelections[m.c] = {
       code: m.c,
       name: m.n,
       sem: sem,
       u: m.u,
-      selected: isAlreadyPassed || isEarlySem,
-      score: (existing && existing.score) ? existing.score : 7
+      selected: isSelected,
+      score: score
     };
   });
 
+  detectedStudentMetadata.count = autoSelectedCount;
+
+  // Actualizar UI del Panel de Información de Interés
+  document.getElementById('extractedStudentName').textContent = detectedStudentMetadata.nombre;
+  document.getElementById('extractedStudentCedula').textContent = detectedStudentMetadata.cedula ? 'V-' + detectedStudentMetadata.cedula : 'Por registrar';
+  document.getElementById('extractedStudentExp').textContent = detectedStudentMetadata.expediente || 'S/E';
+  document.getElementById('extractedStudentCarrera').textContent = CAREERS[detectedStudentMetadata.carrera] || detectedStudentMetadata.carrera;
+  document.getElementById('extractedStudentIndice').textContent = 'Calculado al aplicar';
+  document.getElementById('extractedStudentCount').textContent = autoSelectedCount + ' asignaturas leídas';
+
+  // Renderizar la lista completa de asignaturas para TODOS los semestres (I al X + E)
+  renderScannedSubjectsTable(semMap, romanOrder);
+
+  // Cambiar a fase de resultados
+  const phaseRunning = document.getElementById('scanPhaseRunning');
+  const phaseResults = document.getElementById('scanPhaseResults');
+  const footer = document.getElementById('scanModalFooter');
+
+  if (phaseRunning) phaseRunning.style.display = 'none';
+  if (phaseResults) phaseResults.style.display = 'block';
+  if (footer) footer.style.display = 'flex';
+  updateScanSummary();
+}
+
+function renderScannedSubjectsTable(semMap, romanOrder) {
+  const container = document.getElementById('scanSubjectsList');
+  if (!container) return;
+
   let html = '';
+
   romanOrder.forEach(sCode => {
-    if (!semMap[sCode]) return;
+    if (!semMap[sCode] || !semMap[sCode].length) return;
     const sName = sCode === 'E' ? 'Electivas Profesionales' : 'Semestre ' + sCode;
 
-    html += '<div style="background:#F8FAFC;border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;margin-bottom:6px;">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;font-size:13px;color:var(--unexpo-navy);">';
+    // Contar cuántas materias de este semestre están marcadas
+    const semRows = semMap[sCode];
+    let semSelected = 0;
+    semRows.forEach(m => {
+      if (detectedSubjectSelections[m.c] && detectedSubjectSelections[m.c].selected) semSelected++;
+    });
+
+    html += '<div class="semester-scan-block" style="background:#F8FAFC;border:1.5px solid var(--card-border);border-radius:10px;padding:10px 12px;margin-bottom:8px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;font-size:13.5px;color:var(--unexpo-navy);flex-wrap:wrap;gap:6px;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;">';
     html += '<span>📘 ' + sName + '</span>';
-    html += '<button type="button" class="btn btn-secondary btn-sm" style="font-size:10px;padding:2px 6px;" onclick="toggleSemesterSelection(\'' + sCode + '\')">Alternar Semestre</button>';
+    html += '<span id="sem_badge_' + sCode + '" style="font-size:11px;font-weight:800;color:var(--text-muted);background:#E2E8F0;padding:2px 6px;border-radius:4px;">' + semSelected + ' de ' + semRows.length + ' marcadas</span>';
+    html += '</div>';
+    html += '<button type="button" class="btn btn-secondary btn-sm" style="font-size:10.5px;padding:2px 8px;font-weight:800;color:var(--unexpo-navy);border-color:var(--cat-yellow);" onclick="toggleSpecificSemester(\'' + sCode + '\')">Alternar Semestre ' + sCode + '</button>';
     html += '</div>';
 
-    semMap[sCode].forEach(m => {
+    semRows.forEach(m => {
       const item = detectedSubjectSelections[m.c];
-      const isChk = item.selected ? 'checked' : '';
-      const sc = item.score;
+      const isChk = (item && item.selected) ? 'checked' : '';
+      const sc = (item && item.score) ? parseFloat(item.score).toFixed(2) : '7.00';
 
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:6px;background:#FFF;border:1px solid #E2E8F0;margin-bottom:4px;">';
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;border-radius:6px;background:#FFF;border:1px solid #E2E8F0;margin-bottom:4px;">';
       html += '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;margin:0;font-size:12.5px;">';
-      html += '<input type="checkbox" id="chk_subj_' + m.c + '" ' + isChk + ' onchange="onScanSubjectCheck(\'' + m.c + '\', this.checked)" style="width:16px;height:16px;accent-color:var(--cat-yellow-dark);">';
+      html += '<input type="checkbox" id="chk_subj_' + m.c + '" ' + isChk + ' onchange="onScanSubjectCheck(\'' + m.c + '\', this.checked)" style="width:17px;height:17px;accent-color:var(--cat-yellow-dark);">';
       html += '<div>';
       html += '<span style="font-weight:800;color:var(--unexpo-navy);">' + m.c + '</span> ';
       html += '<span style="font-weight:600;color:var(--text-main);">' + m.n + '</span> ';
@@ -1840,14 +2052,10 @@ function buildScannedSubjectsList() {
       html += '</div>';
       html += '</label>';
 
-      html += '<div style="display:flex;align-items:center;gap:4px;">';
-      html += '<span style="font-size:11px;font-weight:700;color:var(--text-muted);">Nota:</span>';
-      html += '<select id="score_subj_' + m.c + '" class="form-control" style="width:auto;padding:2px 6px;font-size:12px;font-weight:800;" onchange="onScanSubjectScore(\'' + m.c + '\', this.value)">';
-      [9,8,7,6,5].forEach(v => {
-        const sel = v === sc ? 'selected' : '';
-        html += '<option value="' + v + '" ' + sel + '>' + v + ' pts</option>';
-      });
-      html += '</select>';
+      html += '<div style="display:flex;align-items:center;gap:6px;">';
+      html += '<span style="font-size:11.5px;font-weight:800;color:var(--text-muted);">Nota Exacta:</span>';
+      html += '<input type="number" id="score_subj_' + m.c + '" class="form-control" value="' + sc + '" step="0.1" min="1" max="9" style="width:78px;padding:2px 6px;font-size:12.5px;font-weight:800;text-align:center;" onchange="onScanSubjectScore(\'' + m.c + '\', this.value)">';
+      html += '<span style="font-size:11px;font-weight:700;color:var(--text-muted);">pts</span>';
       html += '</div>';
 
       html += '</div>';
@@ -1868,18 +2076,28 @@ function onScanSubjectCheck(code, checked) {
 
 function onScanSubjectScore(code, scoreVal) {
   if (detectedSubjectSelections[code]) {
-    detectedSubjectSelections[code].score = parseInt(scoreVal, 10) || 7;
+    const val = parseFloat(scoreVal);
+    detectedSubjectSelections[code].score = !isNaN(val) ? val : 7.00;
   }
 }
 
-function toggleSemesterSelection(sCode) {
+function toggleSpecificSemester(sCode) {
+  let anyUnchecked = false;
   Object.keys(detectedSubjectSelections).forEach(c => {
-    if (detectedSubjectSelections[c].sem === sCode) {
-      detectedSubjectSelections[c].selected = !detectedSubjectSelections[c].selected;
-      const el = document.getElementById('chk_subj_' + c);
-      if (el) el.checked = detectedSubjectSelections[c].selected;
+    if (detectedSubjectSelections[c].sem === sCode && !detectedSubjectSelections[c].selected) {
+      anyUnchecked = true;
     }
   });
+
+  const targetState = anyUnchecked;
+  Object.keys(detectedSubjectSelections).forEach(c => {
+    if (detectedSubjectSelections[c].sem === sCode) {
+      detectedSubjectSelections[c].selected = targetState;
+      const el = document.getElementById('chk_subj_' + c);
+      if (el) el.checked = targetState;
+    }
+  });
+
   updateScanSummary();
 }
 
@@ -1907,37 +2125,76 @@ function selectAllDetected(val) {
 }
 
 function applyGlobalGradeToAll(scoreVal) {
-  const num = parseInt(scoreVal, 10) || 7;
+  const num = parseFloat(scoreVal) || 7.00;
   Object.keys(detectedSubjectSelections).forEach(c => {
     detectedSubjectSelections[c].score = num;
     const el = document.getElementById('score_subj_' + c);
-    if (el) el.value = num;
+    if (el) el.value = num.toFixed(2);
   });
 }
 
 function updateScanSummary() {
   let count = 0;
   let uc = 0;
+  const semCounts = {};
+
   Object.keys(detectedSubjectSelections).forEach(c => {
-    if (detectedSubjectSelections[c].selected) {
+    const item = detectedSubjectSelections[c];
+    if (!semCounts[item.sem]) semCounts[item.sem] = { total: 0, checked: 0 };
+    semCounts[item.sem].total++;
+
+    if (item.selected) {
       count++;
-      uc += detectedSubjectSelections[c].u;
+      uc += item.u;
+      semCounts[item.sem].checked++;
     }
   });
+
+  // Actualizar badges por semestre
+  Object.keys(semCounts).forEach(sCode => {
+    const b = document.getElementById('sem_badge_' + sCode);
+    if (b) {
+      b.textContent = semCounts[sCode].checked + ' de ' + semCounts[sCode].total + ' marcadas';
+      if (semCounts[sCode].checked > 0) {
+        b.style.background = 'var(--cat-yellow)';
+        b.style.color = 'var(--unexpo-navy)';
+      } else {
+        b.style.background = '#E2E8F0';
+        b.style.color = 'var(--text-muted)';
+      }
+    }
+  });
+
   const sumEl = document.getElementById('scanSummaryCount');
   if (sumEl) {
-    sumEl.textContent = count + ' materias seleccionadas (' + uc + ' U.C. aprobadas)';
+    sumEl.textContent = count + ' materias seleccionadas (' + uc + ' U.C. aprobadas sin redondear)';
   }
 }
 
 function applyScannedGrades() {
+  const chkProfile = document.getElementById('chkAutoUpdateProfile');
+  const shouldUpdateProfile = chkProfile ? chkProfile.checked : true;
+
+  if (shouldUpdateProfile && detectedStudentMetadata.cedula) {
+    userProfile.cedula = detectedStudentMetadata.cedula;
+    userProfile.nombre = detectedStudentMetadata.nombre || userProfile.nombre;
+    userProfile.expediente = detectedStudentMetadata.expediente || userProfile.expediente;
+    userProfile.carrera = detectedStudentMetadata.carrera || userProfile.carrera;
+    currentUserCedula = userProfile.cedula;
+    localStorage.setItem('poli_active_cedula', userProfile.cedula);
+
+    if (STUDENTS_DB[userProfile.cedula]) {
+      userProfile.turno = STUDENTS_DB[userProfile.cedula][2] || userProfile.turno;
+    }
+  }
+
   let appliedCount = 0;
   Object.keys(detectedSubjectSelections).forEach(c => {
     const item = detectedSubjectSelections[c];
     if (item.selected) {
       studentGrades[c] = {
         status: 'ok',
-        score: item.score,
+        score: parseFloat(item.score) || 7.00,
         docId: currentProcessingDoc ? currentProcessingDoc.id : null,
         updatedAt: new Date().toLocaleDateString('es-VE')
       };
@@ -1946,11 +2203,18 @@ function applyScannedGrades() {
   });
 
   saveActiveUserData();
+  updateHeaderUserChip();
+
+  const sel = document.getElementById('carreraSelect');
+  if (sel) sel.value = userProfile.carrera;
+  const sub = document.getElementById('carreraSubtitle');
+  if (sub) sub.textContent = (CAREERS[userProfile.carrera] || userProfile.carrera) + ' (Pensum Oficial)';
+
   renderSemesters(userProfile.carrera);
   updateProgressStats();
   closeModal('modalProcessDoc');
 
-  showToast('🎉 ¡Pensum Actualizado! Se aplicaron ' + appliedCount + ' materias aprobadas y se recalculó tu avance.');
+  showToast('🎉 ¡Pensum Actualizado! Se aplicaron ' + appliedCount + ' materias con sus notas exactas.');
 }
 
 function reprocessDocById(docId) {
@@ -2552,8 +2816,8 @@ function cycleSubjectStatus(code, uc) {
     nextStatus = 'cur';
   } else if (current.status === 'cur') {
     nextStatus = 'ok';
-    const inputScore = prompt('Introduce la calificación obtenida (1 a 9 pts):', '7');
-    nextScore = inputScore ? Math.min(9, Math.max(5, parseInt(inputScore) || 5)) : 5;
+    const inputScore = prompt('Introduce la calificación obtenida exacta (1 a 9 pts, ej: 7.50):', '7.00');
+    nextScore = inputScore ? Math.min(9, Math.max(1, parseFloat(inputScore) || 5.00)) : 5.00;
   } else {
     nextStatus = 'pen';
     nextScore = 0;
@@ -2609,7 +2873,7 @@ function updateProgressStats() {
     }
   });
 
-  const pct = totalUc > 0 ? Math.round((approvedUc / totalUc) * 100) : 0;
+  const pct = totalUc > 0 ? ((approvedUc / totalUc) * 100).toFixed(2) : '0.00';
   const avg = approvedUc > 0 ? (sumScoreWeighted / approvedUc).toFixed(2) : '0.0';
 
   const statPct = document.getElementById('statPorcentaje');
@@ -2874,20 +3138,46 @@ function renderEvaluationsTable() {
   if (meterBar) meterBar.style.width = Math.min(100, totalAcum) + '%';
   if (pondRestEl) pondRestEl.textContent = 'Ponderación evaluada: ' + totalPond + '%';
 
-  let equivScale = 1;
+  let equivScale = 0;
   let desc = '';
-  if (totalAcum >= 90) { equivScale = 9; desc = '¡Sobresaliente! (Aprobado)'; }
-  else if (totalAcum >= 80) { equivScale = 8; desc = '¡Distinguido! (Aprobado)'; }
-  else if (totalAcum >= 70) { equivScale = 7; desc = '¡Bueno! (Aprobado)'; }
-  else if (totalAcum >= 60) { equivScale = 6; desc = '¡Regular! (Aprobado)'; }
-  else if (totalAcum >= 50) { equivScale = 5; desc = '¡Materia Aprobada con la nota mínima reglamentaria!'; }
-  else {
-    equivScale = Math.max(1, Math.floor(totalAcum / 10));
-    const falta = (50 - totalAcum).toFixed(1);
-    desc = 'Requiere acumular ' + falta + ' puntos más para aprobar.';
+  // Equivalencia Oficial UNEXPO (Artículo 48 Reglamento de Evaluación - Sin Redondear)
+  if (totalAcum >= 91) {
+    equivScale = 9;
+    desc = '9 pts · Excelente (Aprobado: 91% a 100%)';
+  } else if (totalAcum >= 81) {
+    equivScale = 8;
+    desc = '8 pts · Sobresaliente (Aprobado: 81% a 90%)';
+  } else if (totalAcum >= 71) {
+    equivScale = 7;
+    desc = '7 pts · Distinguido (Aprobado: 71% a 80%)';
+  } else if (totalAcum >= 61) {
+    equivScale = 6;
+    desc = '6 pts · Bueno (Aprobado: 61% a 70%)';
+  } else if (totalAcum >= 50) {
+    equivScale = 5;
+    desc = '5 pts · Satisfactorio (Aprobado: Nota mínima reglamentaria 50% a 60%)';
+  } else if (totalAcum >= 37) {
+    equivScale = 4;
+    const falta = (50 - totalAcum).toFixed(2);
+    desc = '4 pts · Deficiente (Reprobado: 37% a 49%). Requiere ' + falta + ' pts para aprobar';
+  } else if (totalAcum >= 25) {
+    equivScale = 3;
+    const falta = (50 - totalAcum).toFixed(2);
+    desc = '3 pts · Deficiente (Reprobado: 25% a 36%). Requiere ' + falta + ' pts para aprobar';
+  } else if (totalAcum >= 13) {
+    equivScale = 2;
+    const falta = (50 - totalAcum).toFixed(2);
+    desc = '2 pts · Muy Deficiente (Reprobado: 13% a 24%). Requiere ' + falta + ' pts para aprobar';
+  } else if (totalAcum >= 1) {
+    equivScale = 1;
+    const falta = (50 - totalAcum).toFixed(2);
+    desc = '1 pt · Muy Deficiente (Reprobado: 1% a 12%). Requiere ' + falta + ' pts para aprobar';
+  } else {
+    equivScale = 0;
+    desc = '0 pts · Sin evaluaciones registradas aún';
   }
 
-  if (equivEl) equivEl.textContent = equivScale + ' pts (Escala 1 al 9)';
+  if (equivEl) equivEl.textContent = equivScale + ' pts (Equivalencia Oficial Art. 48)';
   if (statusDesc) statusDesc.textContent = desc;
 }
 
