@@ -1,11 +1,15 @@
 /* Service Worker PoliApp UNEXPO · Modo Offline Total */
-const CACHE = 'poliapp-v4-pensums-offline';
+const CACHE = 'poliapp-v5-pro-caterpillar';
 const CORE = [
   './',
   'index.html',
   'manifest.webmanifest',
   'icons/icon-192.png',
   'icons/icon-512.png',
+  'icons/unexpo_logo_dual.png',
+  'icons/unexpo_logo_dual_light.png',
+  'icons/unexpo_logo_white.png',
+  'icons/unexpo_logo_yellow.png',
   'pensums/pensums_index.json'
 ];
 
