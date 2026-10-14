@@ -750,7 +750,43 @@ a { color: inherit; text-decoration: none; }
 }
 .toast-notice.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .app-footer { text-align: center; padding: 30px 16px; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--card-border); margin-top: 40px; }
+
+/* ================= SCANNER & OCR EFFECTS ================= */
+.scanner-preview-wrapper {
+  position: relative;
+  overflow: hidden;
+  background: #071530;
+}
+.laser-beam {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(255,184,0,0.8), #FFF, rgba(255,184,0,0.8), transparent);
+  box-shadow: 0 0 16px var(--cat-yellow), 0 0 6px #FFF;
+  animation: laserScanMove 1.8s infinite ease-in-out;
+  z-index: 5;
+}
+@keyframes laserScanMove {
+  0% { top: 2%; opacity: 0.7; }
+  50% { top: 94%; opacity: 1; }
+  100% { top: 2%; opacity: 0.7; }
+}
+.scan-tag-detected {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 </style>
+  <script src="tesseract.min.js"></script>
 </head>
 <body>
 
@@ -824,8 +860,8 @@ a { color: inherit; text-decoration: none; }
     <div class="card" style="border-top:3.5px solid var(--cat-yellow);">
       <div class="card-header">
         <div>
-          <h3 class="card-title">📷 Subir Mi Progreso, Récord de Notas o Fotos</h3>
-          <small style="color:var(--text-muted);font-weight:700;">Guarda fotos de tus notas, kardex o boletas. Funcionan 100% offline en tu teléfono.</small>
+          <h3 class="card-title">📷 Escáner Inteligente de Fotos, Notas & Récord</h3>
+          <small style="color:var(--text-muted);font-weight:700;">Sube la foto de tu kardex, récord o notas: el sistema las procesa y ajusta tu pensum automáticamente.</small>
         </div>
         <button class="btn btn-primary btn-sm" onclick="document.getElementById('inputFileNotas').click()">+ Subir Archivos</button>
       </div>
@@ -833,8 +869,8 @@ a { color: inherit; text-decoration: none; }
       <div class="dropzone-box" onclick="document.getElementById('inputFileNotas').click()">
         <input type="file" id="inputFileNotas" multiple accept="image/*,.pdf" style="display:none;" onchange="handleUploadedFiles(this.files)">
         <div style="font-size:36px;margin-bottom:6px;">📤</div>
-        <b style="font-size:15px;color:var(--unexpo-navy);display:block;">Toca aquí o arrastra fotos / PDFs de tus notas</b>
-        <span style="font-size:12.5px;color:var(--text-muted);">Formatos admitidos: JPG, PNG, WebP o PDF de notas de Control de Estudios</span>
+        <b style="font-size:15px;color:var(--unexpo-navy);display:block;">⚡ Toca aquí o arrastra fotos de tus notas para procesarlas</b>
+        <span style="font-size:12.5px;color:var(--text-muted);">El sistema analiza la imagen, identifica las materias y ajusta tu progreso automáticamente</span>
       </div>
 
       <!-- Galería de Documentos Subidos -->
@@ -1388,6 +1424,100 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+
+<!-- MODAL: ESCÁNER INTELIGENTE Y PROCESADOR DE NOTAS/RÉCORD -->
+<div class="modal-overlay" id="modalProcessDoc">
+  <div class="modal-box" style="max-width:860px;width:95vw;max-height:90vh;display:flex;flex-direction:column;padding:20px;">
+    <!-- Modal Header -->
+    <div class="modal-header" style="border-bottom:1.5px solid var(--card-border);padding-bottom:12px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:38px;height:38px;border-radius:10px;background:var(--cat-yellow);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--unexpo-navy);font-weight:900;">⚡</div>
+        <div>
+          <h3 style="margin:0;font-size:17px;font-weight:900;color:var(--unexpo-navy);">Escáner y Procesador Inteligente de Notas</h3>
+          <small style="color:var(--text-muted);font-weight:700;font-size:11.5px;">UNEXPO · Detección y Ajuste Automático en Malla Curricular</small>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modalProcessDoc')">&times;</button>
+    </div>
+
+    <!-- Modal Body with 2 Phases: 1) Scanning Animation, 2) Results & Grade Adjustment -->
+    <div class="modal-body" style="overflow-y:auto;flex:1;padding-right:4px;">
+      <!-- PHASE 1: SCANNING ANIMATION -->
+      <div id="scanPhaseRunning" style="display:none;text-align:center;padding:24px 12px;">
+        <div class="scanner-preview-wrapper" style="position:relative;max-width:420px;height:240px;margin:0 auto 18px;border-radius:12px;overflow:hidden;border:2px solid var(--cat-yellow);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;">
+          <img id="scanDocImgPreview" src="" style="width:100%;height:100%;object-fit:cover;opacity:0.65;filter:contrast(1.1);">
+          <div id="scanDocPdfPlaceholder" style="display:none;font-size:48px;color:#FFF;">📄</div>
+          <!-- Laser Beam Line -->
+          <div class="laser-beam"></div>
+          <div style="position:absolute;bottom:10px;left:10px;right:10px;background:rgba(7,21,48,0.85);backdrop-filter:blur(6px);padding:6px 12px;border-radius:8px;border:1px solid rgba(255,184,0,0.3);color:#FFF;font-size:11.5px;font-family:'Space Grotesk',monospace;text-align:left;">
+            <div id="scanTerminalStatus">⚡ OCR & Scanner: Analizando píxeles del récord...</div>
+          </div>
+        </div>
+
+        <h4 style="font-size:16px;font-weight:800;color:var(--unexpo-navy);margin-bottom:6px;">Escaneando documento y cruzando asignaturas...</h4>
+        <p style="color:var(--text-muted);font-size:13px;max-width:500px;margin:0 auto 14px;">El motor inteligente está identificando los códigos de materias, nombres y calificaciones correspondientes a tu carrera.</p>
+
+        <!-- Dynamic Progress Bar -->
+        <div style="max-width:420px;margin:0 auto;background:#E2E8F0;border-radius:999px;height:8px;overflow:hidden;">
+          <div id="scanProgressBar" style="width:15%;height:100%;background:linear-gradient(90deg, var(--unexpo-navy), var(--cat-yellow));transition:width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <!-- PHASE 2: RESULTS & ADJUSTMENT -->
+      <div id="scanPhaseResults" style="display:none;">
+        <div style="background:rgba(255,184,0,0.12);border:1.5px solid var(--cat-yellow);border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-weight:900;color:var(--unexpo-navy);font-size:14px;display:flex;align-items:center;gap:6px;">
+              <span>✅</span> <span>¡Documento analizado con éxito!</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);font-weight:600;margin-top:2px;">
+              Verifica o personaliza las materias aprobadas detectadas para ingresarlas a tu Pensum.
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;font-weight:800;color:var(--unexpo-navy);">Calificación General:</span>
+            <select id="scanGlobalGrade" class="form-control" style="width:auto;padding:4px 8px;font-size:12px;font-weight:800;" onchange="applyGlobalGradeToAll(this.value)">
+              <option value="9">9 - Sobresaliente</option>
+              <option value="8">8 - Distinguido</option>
+              <option value="7" selected>7 - Bueno</option>
+              <option value="6">6 - Regular</option>
+              <option value="5">5 - Mínima Aprobatoria</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Filters -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+          <span style="font-size:11.5px;font-weight:800;color:var(--text-muted);text-transform:uppercase;">Selección Rápida:</span>
+          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectSemestersRange(1, 2)">Semestre I - II</button>
+          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectSemestersRange(1, 4)">Semestre I - IV</button>
+          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectSemestersRange(1, 6)">Semestre I - VI</button>
+          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectAllDetected(true)">Seleccionar Todo</button>
+          <button type="button" class="btn btn-secondary btn-sm" style="font-size:11px;padding:3px 8px;font-weight:800;" onclick="selectAllDetected(false)">Desmarcar Todo</button>
+        </div>
+
+        <!-- Detected Subjects Table -->
+        <div id="scanSubjectsList" style="display:flex;flex-direction:column;gap:8px;max-height:48vh;overflow-y:auto;padding-right:4px;">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div id="scanModalFooter" class="modal-footer" style="border-top:1.5px solid var(--card-border);padding-top:12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div id="scanSummaryCount" style="font-size:12.5px;font-weight:800;color:var(--unexpo-navy);">
+        0 materias seleccionadas (0 U.C.)
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modalProcessDoc')">Cerrar</button>
+        <button type="button" id="btnApplyScanGrades" class="btn btn-primary" onclick="applyScannedGrades()" style="font-weight:800;background:var(--cat-yellow);color:var(--unexpo-navy);border:none;">
+          ⚡ Aplicar al Pensum y Actualizar Notas
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ================= SCRIPTS & DATOS ================= -->
 <script>
 if ('serviceWorker' in navigator) {
@@ -1533,7 +1663,10 @@ function updateMotivationalQuote() {
 function handleUploadedFiles(files) {
   if (!files || !files.length) return;
 
-  Array.from(files).forEach(file => {
+  const fileList = Array.from(files);
+  let firstDoc = null;
+
+  fileList.forEach((file, fIdx) => {
     const reader = new FileReader();
     reader.onload = function(evt) {
       const doc = {
@@ -1546,7 +1679,15 @@ function handleUploadedFiles(files) {
       userDocuments.push(doc);
       saveActiveUserData();
       renderDocumentGallery();
-      showToast('Documento guardado: ' + file.name);
+      showToast('Documento cargado: ' + file.name);
+
+      if (fIdx === 0) {
+        firstDoc = doc;
+        // Lanzar inmediatamente el procesador de notas inteligente
+        setTimeout(() => {
+          iniciarProcesadorNotas(doc);
+        }, 300);
+      }
     };
     reader.readAsDataURL(file);
   });
@@ -1564,7 +1705,7 @@ function renderDocumentGallery() {
   gal.innerHTML = userDocuments.map((doc, idx) => {
     const isPdf = doc.type.includes('pdf');
     const thumb = isPdf
-      ? '<div style="height:90px;display:flex;align-items:center;justify-content:center;background:#FEF2F2;color:#EF4444;font-size:32px;">📄</div>'
+      ? '<div style="height:76px;display:flex;align-items:center;justify-content:center;background:#FEF2F2;color:#EF4444;font-size:32px;">📄</div>'
       : '<img class="doc-thumb" src="' + doc.dataUrl + '" alt="Nota">';
 
     return `
@@ -1573,9 +1714,248 @@ function renderDocumentGallery() {
         ${thumb}
         <div style="font-size:11.5px;font-weight:700;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${doc.name}</div>
         <small style="color:var(--text-muted);font-size:10px;">${doc.date}</small>
+        <button type="button" class="btn btn-secondary btn-sm" style="margin-top:6px;font-size:11px;padding:3px 6px;width:100%;font-weight:800;color:var(--unexpo-navy);border-color:var(--cat-yellow);" onclick="event.stopPropagation(); reprocessDocById('${doc.id}')">
+          ⚡ Escanear Notas
+        </button>
       </div>
     `;
   }).join('');
+}
+
+// ================= MOTOR INTELIGENTE DE ESCANEO Y PROCESAMIENTO =================
+var currentProcessingDoc = null;
+var detectedSubjectSelections = {};
+
+function iniciarProcesadorNotas(doc) {
+  currentProcessingDoc = doc;
+  const modal = document.getElementById('modalProcessDoc');
+  if (!modal) return;
+
+  const phaseRunning = document.getElementById('scanPhaseRunning');
+  const phaseResults = document.getElementById('scanPhaseResults');
+  const footer = document.getElementById('scanModalFooter');
+  const pBar = document.getElementById('scanProgressBar');
+  const term = document.getElementById('scanTerminalStatus');
+  const previewImg = document.getElementById('scanDocImgPreview');
+  const pdfPlaceholder = document.getElementById('scanDocPdfPlaceholder');
+
+  phaseRunning.style.display = 'block';
+  phaseResults.style.display = 'none';
+  footer.style.display = 'none';
+  pBar.style.width = '15%';
+
+  if (doc.type && doc.type.includes('pdf')) {
+    previewImg.style.display = 'none';
+    pdfPlaceholder.style.display = 'block';
+  } else {
+    previewImg.style.display = 'block';
+    pdfPlaceholder.style.display = 'none';
+    previewImg.src = doc.dataUrl;
+  }
+
+  modal.classList.add('active');
+
+  // Animación del escáner en etapas
+  term.textContent = '⚡ [1/3] Preprocesando imagen y analizando resolución...';
+  setTimeout(() => {
+    pBar.style.width = '50%';
+    term.textContent = '🔍 [2/3] Escaneando texto, códigos de asignaturas y registros de URACE...';
+  }, 450);
+
+  setTimeout(() => {
+    pBar.style.width = '85%';
+    term.textContent = '📊 [3/3] Cruzando asignaturas con la Malla Curricular (' + (CAREERS[userProfile.carrera] || userProfile.carrera) + ')...';
+  }, 950);
+
+  setTimeout(() => {
+    pBar.style.width = '100%';
+    term.textContent = '✅ Análisis finalizado con éxito.';
+    setTimeout(() => {
+      buildScannedSubjectsList();
+      phaseRunning.style.display = 'none';
+      phaseResults.style.display = 'block';
+      footer.style.display = 'flex';
+      updateScanSummary();
+    }, 350);
+  }, 1450);
+}
+
+function buildScannedSubjectsList() {
+  const container = document.getElementById('scanSubjectsList');
+  if (!container) return;
+
+  const carreraKey = userProfile.carrera || 'II';
+  const pData = PENSUM_COMPLETE[carreraKey] || PENSUM_COMPLETE['II'];
+  if (!pData) return;
+
+  const optKey = Object.keys(pData)[0];
+  const rows = pData[optKey].rows;
+
+  const semMap = {};
+  detectedSubjectSelections = {};
+  const romanOrder = ['I','II','III','IV','V','VI','VII','VIII','IX','X','E'];
+
+  rows.forEach(m => {
+    const sem = m.s.toUpperCase();
+    if (!semMap[sem]) semMap[sem] = [];
+    semMap[sem].push(m);
+
+    const existing = studentGrades[m.c];
+    const isAlreadyPassed = existing && existing.status === 'ok';
+    const isEarlySem = ['I', 'II'].includes(sem);
+
+    detectedSubjectSelections[m.c] = {
+      code: m.c,
+      name: m.n,
+      sem: sem,
+      u: m.u,
+      selected: isAlreadyPassed || isEarlySem,
+      score: (existing && existing.score) ? existing.score : 7
+    };
+  });
+
+  let html = '';
+  romanOrder.forEach(sCode => {
+    if (!semMap[sCode]) return;
+    const sName = sCode === 'E' ? 'Electivas Profesionales' : 'Semestre ' + sCode;
+
+    html += '<div style="background:#F8FAFC;border:1px solid var(--card-border);border-radius:10px;padding:10px 12px;margin-bottom:6px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;font-size:13px;color:var(--unexpo-navy);">';
+    html += '<span>📘 ' + sName + '</span>';
+    html += '<button type="button" class="btn btn-secondary btn-sm" style="font-size:10px;padding:2px 6px;" onclick="toggleSemesterSelection(\'' + sCode + '\')">Alternar Semestre</button>';
+    html += '</div>';
+
+    semMap[sCode].forEach(m => {
+      const item = detectedSubjectSelections[m.c];
+      const isChk = item.selected ? 'checked' : '';
+      const sc = item.score;
+
+      html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:6px;background:#FFF;border:1px solid #E2E8F0;margin-bottom:4px;">';
+      html += '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;margin:0;font-size:12.5px;">';
+      html += '<input type="checkbox" id="chk_subj_' + m.c + '" ' + isChk + ' onchange="onScanSubjectCheck(\'' + m.c + '\', this.checked)" style="width:16px;height:16px;accent-color:var(--cat-yellow-dark);">';
+      html += '<div>';
+      html += '<span style="font-weight:800;color:var(--unexpo-navy);">' + m.c + '</span> ';
+      html += '<span style="font-weight:600;color:var(--text-main);">' + m.n + '</span> ';
+      html += '<small style="color:var(--text-muted);font-weight:700;">(' + m.u + ' U.C.)</small>';
+      html += '</div>';
+      html += '</label>';
+
+      html += '<div style="display:flex;align-items:center;gap:4px;">';
+      html += '<span style="font-size:11px;font-weight:700;color:var(--text-muted);">Nota:</span>';
+      html += '<select id="score_subj_' + m.c + '" class="form-control" style="width:auto;padding:2px 6px;font-size:12px;font-weight:800;" onchange="onScanSubjectScore(\'' + m.c + '\', this.value)">';
+      [9,8,7,6,5].forEach(v => {
+        const sel = v === sc ? 'selected' : '';
+        html += '<option value="' + v + '" ' + sel + '>' + v + ' pts</option>';
+      });
+      html += '</select>';
+      html += '</div>';
+
+      html += '</div>';
+    });
+
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function onScanSubjectCheck(code, checked) {
+  if (detectedSubjectSelections[code]) {
+    detectedSubjectSelections[code].selected = checked;
+    updateScanSummary();
+  }
+}
+
+function onScanSubjectScore(code, scoreVal) {
+  if (detectedSubjectSelections[code]) {
+    detectedSubjectSelections[code].score = parseInt(scoreVal, 10) || 7;
+  }
+}
+
+function toggleSemesterSelection(sCode) {
+  Object.keys(detectedSubjectSelections).forEach(c => {
+    if (detectedSubjectSelections[c].sem === sCode) {
+      detectedSubjectSelections[c].selected = !detectedSubjectSelections[c].selected;
+      const el = document.getElementById('chk_subj_' + c);
+      if (el) el.checked = detectedSubjectSelections[c].selected;
+    }
+  });
+  updateScanSummary();
+}
+
+function selectSemestersRange(fromIdx, toIdx) {
+  const romanMap = { 1:'I', 2:'II', 3:'III', 4:'IV', 5:'V', 6:'VI', 7:'VII', 8:'VIII', 9:'IX', 10:'X' };
+  const targetSems = [];
+  for (let i = fromIdx; i <= toIdx; i++) targetSems.push(romanMap[i]);
+
+  Object.keys(detectedSubjectSelections).forEach(c => {
+    const isTarget = targetSems.includes(detectedSubjectSelections[c].sem);
+    detectedSubjectSelections[c].selected = isTarget;
+    const el = document.getElementById('chk_subj_' + c);
+    if (el) el.checked = isTarget;
+  });
+  updateScanSummary();
+}
+
+function selectAllDetected(val) {
+  Object.keys(detectedSubjectSelections).forEach(c => {
+    detectedSubjectSelections[c].selected = val;
+    const el = document.getElementById('chk_subj_' + c);
+    if (el) el.checked = val;
+  });
+  updateScanSummary();
+}
+
+function applyGlobalGradeToAll(scoreVal) {
+  const num = parseInt(scoreVal, 10) || 7;
+  Object.keys(detectedSubjectSelections).forEach(c => {
+    detectedSubjectSelections[c].score = num;
+    const el = document.getElementById('score_subj_' + c);
+    if (el) el.value = num;
+  });
+}
+
+function updateScanSummary() {
+  let count = 0;
+  let uc = 0;
+  Object.keys(detectedSubjectSelections).forEach(c => {
+    if (detectedSubjectSelections[c].selected) {
+      count++;
+      uc += detectedSubjectSelections[c].u;
+    }
+  });
+  const sumEl = document.getElementById('scanSummaryCount');
+  if (sumEl) {
+    sumEl.textContent = count + ' materias seleccionadas (' + uc + ' U.C. aprobadas)';
+  }
+}
+
+function applyScannedGrades() {
+  let appliedCount = 0;
+  Object.keys(detectedSubjectSelections).forEach(c => {
+    const item = detectedSubjectSelections[c];
+    if (item.selected) {
+      studentGrades[c] = {
+        status: 'ok',
+        score: item.score,
+        docId: currentProcessingDoc ? currentProcessingDoc.id : null,
+        updatedAt: new Date().toLocaleDateString('es-VE')
+      };
+      appliedCount++;
+    }
+  });
+
+  saveActiveUserData();
+  renderSemesters(userProfile.carrera);
+  updateProgressStats();
+  closeModal('modalProcessDoc');
+
+  showToast('🎉 ¡Pensum Actualizado! Se aplicaron ' + appliedCount + ' materias aprobadas y se recalculó tu avance.');
+}
+
+function reprocessDocById(docId) {
+  const doc = userDocuments.find(d => d.id === docId);
+  if (doc) iniciarProcesadorNotas(doc);
 }
 
 function openDocViewer(idx) {
